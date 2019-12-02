@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>	
+</head>
+    <body>      
+		<form id="setup" class="form-inline">
+			<label >Robot IP Address</label>
+			<div>
+				<input id="misty-robot-ip-address">
+				<button id="set-up" type="submit" class="btn btn-primary pull-down submit form-control">Reload Skills</button>
+			</div>
+		</form>
+		<p>
+				Enter your IP and reload the skills
+		</p>
+		<div id="toast-container">
+			<div id="toast"></div>
+		</div>
+	</body>	
+	<script>
+			$("#setup").submit(async function (e) {
+				e.preventDefault();
+				var ip = $("#misty-robot-ip-address").val();
+	
+				if (!ip) {
+					alert("Please enter a valid IP or name");
+					return;
+				}
+				await RunMe(ip);
+			});
+			
+			async function RunMe(ip) {
+
+				//Call the APIs
+				//var lightClient = new LightClient(ip, 10000);
+	
+				PostCommand(ip, "skills/reload", {}, successCallback);	
+			}
+
+			function successCallback()
+			{
+				alert("Skills reloading successfully...");
+			}
+
+			function PostCommand(ipAddress, command, theData = {}, successCallback = null, dataType = "application/json", failCallback = null) {
+				var newUri = "http://" + ipAddress + "/api/" + command;
+				$.ajax({
+					type: "POST",
+					url: newUri,
+					headers: {
+						"Accept": dataType,
+						"Content-Type": dataType,
+					},
+					data: theData,
+					dataType: "json",
+					async: true,
+					timeout: 30000
+				})
+					.done(function (data, status, xhr) {
+						if (data === null || data.status === "Error") {
+							if (failCallback) {
+								failCallback(data, status, xhr);
+							} else {
+								console.log("Post Response Error:", data.errorMessage);
+								alert("Post Response Error:" +  data.errorMessage);
+							}
+						}
+						else if (successCallback) {
+							successCallback(data);
+							console.log("Skills reloading successfully...");
+						}
+					})
+					.fail(function (request, status, err) {
+						if (failCallback) {
+							failCallback(request, status, err);
+						} else {
+							// There was an error with the call.  Display error messages.
+							console.log("Post Http Error: ", request, status, err);
+							alert("Having trouble connecting to the robot...");
+						}
+					});
+			};
+		</script>
+</html>
+
