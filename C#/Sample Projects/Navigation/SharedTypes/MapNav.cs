@@ -61,7 +61,7 @@ namespace MistySkillTypes
 			_misty.RegisterSlamStatusEvent(SlamStatusCallback, 0, true, "MapDockSlamStatusEvent", null, OnResponse);
 			_misty.RegisterSelfStateEvent(SelfStateCallback, 250, true, "MapDockSelfStateEvent", OnResponse);
 
-			// There is a current defect where switching maps does not fully take affect until we start tracking
+			// There is a current defect where switching maps does not fully take effect until we start tracking
 			// and stop tracking. So we need to start, stop, and re-start.
 			_misty.StopTracking(OnResponse);
 			await Task.Delay(4000);

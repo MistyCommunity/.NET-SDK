@@ -67,7 +67,7 @@ namespace MistySkillTypes
 		private const double SWEEP_STEP_DEGREES = 10;				// Sweep for charger step size
 		private const int DOCKING_MAX_RETRIES = 3;                  // How many times to try complete docking process
 		private const int ALIGN_MAX_RETRIES = 4;                    // How many times to try and align with charger per overall docking attempt
-		private const int SHIMMY_RETRIES = 10;                      // How many time to ty and shimy for final alignement on charger
+		private const int SHIMMY_RETRIES = 10;                      // How many times to try and shimy for final alignement on charger
 
 		private const int DockingStationDetectorEnabled = 0x10000;
 
