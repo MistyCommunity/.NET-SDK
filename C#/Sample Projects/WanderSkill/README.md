@@ -1,6 +1,6 @@
 # WanderSkill
 
-A basic C# example skill that attempts to wander an area using it's bump and time of flight sensors.
+A basic C# example skill that attempts to wander an area using its bump and time of flight sensors.
 
 Has two optional parameters.
 
