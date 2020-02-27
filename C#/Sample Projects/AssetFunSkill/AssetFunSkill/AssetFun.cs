@@ -54,6 +54,7 @@ namespace AssetFunSkill
 		
 		public async void OnStart(object sender, IDictionary<string, object> parameters)
 		{
+			ProcessParameters(parameters);
 			await _misty.EnableAudioServiceAsync();
 
 			_misty.TransitionLED(255, 140, 0, 0, 0, 255, LEDTransition.Breathe, 500, null);
