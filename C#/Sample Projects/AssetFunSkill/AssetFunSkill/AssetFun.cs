@@ -249,8 +249,6 @@ namespace AssetFunSkill
 		
 		private async Task<int> WriteMe(string textToWrite, string layer, string stringDelimiters = " ,!.?", int delayMilliseconds = 500)
 		{
-			_misty.DisplayText(" ", layer, null);
-			
 			//Set a random-ish display layer
 			await _misty.SetTextDisplaySettingsAsync
 			(
