@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MistyRobotics.Common.Data;
@@ -12,7 +13,6 @@ using MistyRobotics.SDK.Messengers;
 using MistyRobotics.Tools.DataStorage;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using System.Text.RegularExpressions;
 
 namespace AssetFunSkill
 {
@@ -39,7 +39,8 @@ namespace AssetFunSkill
 		private IList<AudioDetails> _audioList = new List<AudioDetails>();
 		private IList<VideoDetails> _videoList = new List<VideoDetails>();
 		private char[] _textDelimiters = new char[] { ' ', '.', ',', '!', '?' };
-		
+		private Random _random = new Random();
+
 		public INativeRobotSkill Skill { get; private set; } = new NativeRobotSkill("AssetFunSkill", "b270e022-8859-4a80-a829-0a3f4977e68e")
 		{
 			AllowedCleanupTimeInMs = 2000,
@@ -81,7 +82,7 @@ namespace AssetFunSkill
 				}
 			);
 
-			//_misty.Wait(milliseconds) will wait that amount of time
+			//_misty.Wait(milliseconds) will wait (approx.) that amount of time
 			//if the skill is cancelled, it will return immediately with a false boolean response
 			while (_misty.Wait(5000))
 			{
@@ -120,7 +121,7 @@ namespace AssetFunSkill
 
 		private void ProcessParameters(IDictionary<string, object> parameters)
 		{
-			//Check to see if the robot should reload assets, if the assets don't exist, it will always load them
+			//Check to see if the robot should force the reloading of assets, if the asset name doesn't exist on the robot, it will load them
 			KeyValuePair<string, object> reloadAssetsKVP = parameters.FirstOrDefault(x => x.Key.ToLower() == "reloadassets");
 			if (reloadAssetsKVP.Value != null)
 			{
@@ -132,11 +133,10 @@ namespace AssetFunSkill
 		{
 			try
 			{
-
 				int numRuns = 0;
 				_skillStorage = SkillStorage.GetDatabase(Skill);
 
-				//Keep track of the number of times this is run in the database
+				//Keep track of the number of times this is run in the file
 				IDictionary<string, object> storedData = await _skillStorage.LoadDataAsync();
 				if (storedData != null && storedData.ContainsKey("NumberOfRuns"))
 				{
@@ -240,41 +240,44 @@ namespace AssetFunSkill
 
 		private async void DisplayTextLoop()
 		{
-			await _misty.SetTextDisplaySettingsAsync
-			(
-				"AssetFunLayer1",
-				new TextSettings
-				{
-					Weight = 900,
-					Blue = 255,
-					Red = 120,
-					Green = 140,
-					Size = 90,
-					VerticalAlignment = ImageVerticalAlignment.Bottom,
-					Style = ImageStyle.Italic,
-					FontFamily = "Calibri",
-					HorizontalAlignment = ImageHorizontalAlignment.Stretch,
-					Wrap = true,
-					PadTop = 200,
-					Opacity = 75,
-					PlaceOnTop = true,
-					Rotation = 10,
-					Visible = true
-				}
-			);
-
-			while(_misty.Wait(500))
+			while (_misty.Wait(500))
 			{
-				await WriteMe("Hello!  I hope you enjoy our jack-o-lanterns!", "AssetFunLayer1");
+				await WriteMe("Hello! I hope you enjoy our jack-o-lanterns!", "AssetFunLayer1");
 			}
 		}
 		
 		private async Task<int> WriteMe(string textToWrite, string layer, string stringDelimiters = " ,!.?", int delayMilliseconds = 500)
 		{
+			_misty.DisplayText(" ", layer, null);
+			
+			//Set a random-ish display layer
+			await _misty.SetTextDisplaySettingsAsync
+			(
+				layer,
+				new TextSettings
+				{
+					Weight = _random.Next(600, 1001),
+					Blue = (byte)_random.Next(0, 256),
+					Red = (byte)_random.Next(0, 256),
+					Green = (byte)_random.Next(0, 256),
+					Size = _random.Next(70, 100),
+					VerticalAlignment = ImageVerticalAlignment.Bottom,
+					Style = ImageStyle.Italic,
+					FontFamily = "Calibri",
+					HorizontalAlignment = ImageHorizontalAlignment.Center,
+					Wrap = true,
+					PadTop = _random.Next(180, 220),
+					Opacity = 1,
+					PlaceOnTop = true,
+					Rotation = _random.Next(5, 11),
+					Visible = true
+				}
+			);
+
 			string[] stringArray = Regex.Split(textToWrite, $@"(?<=[{stringDelimiters}])");
 			foreach (string text in stringArray)
 			{
-				await _misty.DisplayTextAsync(text, layer);
+				_misty.DisplayText(text, layer, null);
 				if(!_misty.Wait(delayMilliseconds))
 				{
 					return stringArray.Length;
@@ -285,6 +288,7 @@ namespace AssetFunSkill
 		}
 
 		#region IDisposable Support
+
 		private bool _isDisposed = false;
 
 		private void Dispose(bool disposing)
@@ -304,13 +308,13 @@ namespace AssetFunSkill
 		{
 			Dispose(false);
 		}
-
-		// This code added to correctly implement the disposable pattern.
+		
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
+		
 		#endregion
 	}
 }
