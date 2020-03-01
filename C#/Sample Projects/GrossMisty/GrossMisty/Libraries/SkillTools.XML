@@ -1,0 +1,311 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SkillTools</name>
+    </assembly>
+    <members>
+        <member name="M:SkillTools.Assets.AssetWrapper.ShowSystemImage(SkillTools.Assets.SystemImage)">
+            <summary>
+            Simple method wrapper to help with displaying system images
+            </summary>
+            <param name="systemImage"></param>
+        </member>
+        <member name="M:SkillTools.Assets.AssetWrapper.ShowSystemImage(SkillTools.Assets.SystemImage,System.String)">
+            <summary>
+            Simple method wrapper to help with displaying system images
+            </summary>
+            <param name="systemImage"></param>
+            <param name="layer"></param>
+        </member>
+        <member name="M:SkillTools.Assets.AssetWrapper.PlaySystemSound(SkillTools.Assets.SystemSound)">
+            <summary>
+            Simple method wrapper to help with playing system audio
+            </summary>
+        </member>
+        <member name="M:SkillTools.Assets.AssetWrapper.PlaySystemSound(SkillTools.Assets.SystemSound,System.Int32)">
+            <summary>
+            Simple wrapper method to help with playing system audio
+            </summary>
+        </member>
+        <member name="M:SkillTools.Assets.AssetWrapper.LoadAssets(System.Boolean)">
+            <summary>
+            Attempts to load image, video and audio assets in the project's 'Assets/SkillAssets' folder to the robot's system
+            </summary>
+            <param name="forceReload"></param>
+            <returns></returns>
+        </member>
+        <member name="P:SkillTools.Assets.IAssetWrapper.ImageList">
+            <summary>
+            Current Image List 
+            May be slightly incorrect if new images have been pushed to robot from another source
+            </summary>
+        </member>
+        <member name="P:SkillTools.Assets.IAssetWrapper.AudioList">
+            Current Audio List 
+            May be slightly incorrect if new audio files have been pushed to robot from another source
+        </member>
+        <member name="P:SkillTools.Assets.IAssetWrapper.VideoList">
+            Current video List 
+            May be slightly incorrect if new videos have been pushed to robot from another source
+        </member>
+        <member name="M:SkillTools.Assets.IAssetWrapper.RefreshAssetLists">
+            <summary>
+            Will request the asset lists from the robot and update the skills info
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Assets.IAssetWrapper.ShowSystemImage(SkillTools.Assets.SystemImage)">
+            <summary>
+            Simple method wrapper to help with displaying system images
+            </summary>
+            <param name="systemImage"></param>
+        </member>
+        <member name="M:SkillTools.Assets.IAssetWrapper.ShowSystemImage(SkillTools.Assets.SystemImage,System.String)">
+            <summary>
+            Simple method wrapper to help with displaying system images
+            </summary>
+            <param name="systemImage"></param>
+            <param name="layer"></param>
+        </member>
+        <member name="M:SkillTools.Assets.IAssetWrapper.PlaySystemSound(SkillTools.Assets.SystemSound)">
+            <summary>
+            Simple method wrapper to help with playing system audio
+            </summary>
+        </member>
+        <member name="M:SkillTools.Assets.IAssetWrapper.PlaySystemSound(SkillTools.Assets.SystemSound,System.Int32)">
+            <summary>
+            Simple wrapper method to help with playing system audio
+            </summary>
+        </member>
+        <member name="M:SkillTools.Assets.IAssetWrapper.LoadAssets(System.Boolean)">
+            <summary>
+            Attempts to load image, video and audio assets in the project's 'Assets/SkillAssets' folder to the robot's system
+            </summary>
+            <param name="forceReload">if true, will reload all images in the folder, overwriting any existing</param>
+            <returns></returns>
+        </member>
+        <member name="T:SkillTools.Assets.SystemImage">
+            <summary>
+            Default system images
+            </summary>
+        </member>
+        <member name="T:SkillTools.Assets.SystemSound">
+            <summary>
+            Default system sounds
+            </summary>
+        </member>
+        <member name="T:SkillTools.DataStorage.EncryptedStorage">
+            <summary>
+            Basic data store for long terms storage of skill data
+            IMPORTANT! These are helper data storage classes and are readable and minimally encrypted
+            If you need better security, you may need to write your own
+            </summary>
+        </member>
+        <member name="M:SkillTools.DataStorage.EncryptedStorage.GetDatabase(System.String,System.String)">
+            <summary>
+            Method used to get a reference to the data store
+            IMPORTANT! These are helper data storage classes and are not locked and are simply encrypted.
+            If you need real security, you may need to write your own.
+            Returns null if could not create file or one exists and the password is incorrect on an existing data store with data.
+            Data is encrypted using the password, but the file is not encrypted.  The password encryption is applied when data is stored and retrieved.
+            </summary>
+            <param name="databaseIdentifier"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.DataStorage.EncryptedStorage.#ctor(System.String,System.String)">
+            <summary>
+            IMPORTANT! These are helper data storage classes and are readable and simply encrypted.
+            If you need real security, you may need to write your own.
+            </summary>
+            <param name="databaseIdentifier"></param>
+            <param name="password"></param>
+        </member>
+        <member name="T:SkillTools.DataStorage.ISkillStorage">
+            <summary>
+            Basic data store for long terms storage of skill data
+            Simply saves serialized dictionary data to a text file
+            </summary>
+        </member>
+        <member name="M:SkillTools.DataStorage.ISkillStorage.LoadDataAsync">
+            <summary>
+            Method used to load the data from file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.DataStorage.ISkillStorage.SaveDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Method used to store the data into a file
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.DataStorage.ISkillStorage.DeleteSkillDatabaseAsync">
+            <summary>
+            Deletes the current database file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:SkillTools.DataStorage.BasicStorage">
+            <summary>
+            Basic data store for long terms storage of skill data
+            IMPORTANT! These are helper data storage classes and are readable and minimally encrypted
+            If you need better security, you may need to write your own
+            </summary>
+        </member>
+        <member name="M:SkillTools.DataStorage.BasicStorage.LoadDataAsync">
+            <summary>
+            Method used to load the data from data storage
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.DataStorage.BasicStorage.DeleteSkillDatabaseAsync">
+            <summary>
+            Call to remove the current data file for this skill
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.DataStorage.BasicStorage.SaveDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Method used to store the data into the long term skill data storage
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.DataStorage.BasicStorage.CreateDataStore">
+            <summary>
+            Attempts to create data store at C:\Data\Misty\SDK\SkillData
+            If the path is not accessible, this is probably a robot with an older FFU
+            So will attempt to put it in C:Data\Users\DefaultAccount\Documents\SkillData
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:SkillTools.DataStorage.SkillStorage">
+            <summary>
+            Basic data store for long terms storage of skill data
+            IMPORTANT! These are helper/example data storage classes and are readable and minimally encrypted
+            If you need better security, you can try the EncryptedStorage class or you can need to write your own
+            </summary>
+        </member>
+        <member name="M:SkillTools.DataStorage.SkillStorage.GetDatabase(MistyRobotics.Common.Data.INativeRobotSkill)">
+            <summary>
+            Method used to get a reference to the skill specific data store
+            IMPORTANT! These are helper data storage classes and this version is readable and NOT encrypted
+            If you need security, you can try the EncryptedStorage class or you may need to write your own.
+            </summary>
+            <param name="skill"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SkillTools.Web.IWebMessenger">
+            <summary>
+            Simple Http class to communicate with the outside world
+            </summary>
+        </member>
+        <member name="M:SkillTools.Web.IWebMessenger.GetRequest(System.String)">
+            <summary>
+            Static method to make a GET request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Web.IWebMessenger.PostRequest(System.String,System.String,System.String)">
+            <summary>
+            Static method to make an http POST request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <param name="data">data to send</param>
+            <param name="contentType">the request content type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Web.IWebMessenger.DeleteRequest(System.String,System.String,System.String)">
+            <summary>
+            Static method to make an http DELETE request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <param name="data">data to send</param>
+            <param name="contentType">the request content type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Web.IWebMessenger.PatchRequest(System.String,System.String,System.String)">
+            <summary>
+            Static method to make an http PATCH request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <param name="data">data to send</param>
+            <param name="contentType">the request content type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Web.IWebMessenger.PutRequest(System.String,System.String,System.String)">
+            <summary>
+            Static method to make an http PUT request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <param name="data">data to send</param>
+            <param name="contentType">the request content type</param>
+            <returns></returns>
+        </member>
+        <member name="T:SkillTools.Web.WebMessengerData">
+            <summary>
+            Response from http request
+            </summary>
+        </member>
+        <member name="P:SkillTools.Web.WebMessengerData.HttpCode">
+            <summary>
+            Http response code
+            </summary>
+        </member>
+        <member name="P:SkillTools.Web.WebMessengerData.Response">
+            <summary>
+            Response as text
+            </summary>
+        </member>
+        <member name="T:SkillTools.Web.WebMessenger">
+            <summary>
+            Simple Http class to communicate with the outside world
+            </summary>
+        </member>
+        <member name="M:SkillTools.Web.WebMessenger.GetRequest(System.String)">
+            <summary>
+            Static method to make a GET request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Web.WebMessenger.PostRequest(System.String,System.String,System.String)">
+            <summary>
+            Static method to make an http POST request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <param name="data">data to send</param>
+            <param name="contentType">the request content type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Web.WebMessenger.DeleteRequest(System.String,System.String,System.String)">
+            <summary>
+            Static method to make an http DELETE request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <param name="data">data to send</param>
+            <param name="contentType">the request content type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Web.WebMessenger.PatchRequest(System.String,System.String,System.String)">
+            <summary>
+            Static method to make an http PATCH request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <param name="data">data to send</param>
+            <param name="contentType">the request content type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SkillTools.Web.WebMessenger.PutRequest(System.String,System.String,System.String)">
+            <summary>
+            Static method to make an http PUT request to an external endpoint
+            </summary>
+            <param name="endpoint">the endpoint to call</param>
+            <param name="data">data to send</param>
+            <param name="contentType">the request content type</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
