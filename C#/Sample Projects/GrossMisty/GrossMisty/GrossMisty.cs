@@ -76,11 +76,13 @@ namespace GrossMisty
 				case 3:
 					_misty.PlayAudio("Silly_Farts-Joe-1473367952.wav", null, null);
 					_assetWrapper.ShowSystemImage(SystemImage.TerrorRight);
+					_misty.Wait(3000);
 					_assetWrapper.PlaySystemSound(SystemSound.PhraseUhOh);
 					break;
 				case 4:
 					_misty.PlayAudio("Belch-Kevan-136688254.wav", null, null);
 					_assetWrapper.ShowSystemImage(SystemImage.Disgust);
+					_misty.Wait(3000);
 					break;
 			}
 		}

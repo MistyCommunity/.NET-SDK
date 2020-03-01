@@ -110,7 +110,6 @@
     <Content Include="Assets\SkillAssets\Fart-Common-Everyday-Fart_Mike-Koenig.wav" />
     <Content Include="Assets\SkillAssets\Quick Fart-SoundBible.com-655578646.wav" />
     <Content Include="Assets\SkillAssets\Silly_Farts-Joe-1473367952.wav" />
-    <Content Include="Assets\SkillAssets\Toilet_Flushing-KevanGC-917782919.wav" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png">
       <InProject>false</InProject>
