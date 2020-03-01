@@ -4,92 +4,99 @@
         <name>SkillTools</name>
     </assembly>
     <members>
-        <member name="M:SkillTools.Assets.AssetWrapper.ShowSystemImage(SkillTools.Assets.SystemImage)">
+        <member name="M:SkillTools.AssetTools.AssetWrapper.ShowSystemImage(SkillTools.AssetTools.SystemImage)">
             <summary>
             Simple method wrapper to help with displaying system images
             </summary>
             <param name="systemImage"></param>
         </member>
-        <member name="M:SkillTools.Assets.AssetWrapper.ShowSystemImage(SkillTools.Assets.SystemImage,System.String)">
+        <member name="M:SkillTools.AssetTools.AssetWrapper.ShowSystemImage(SkillTools.AssetTools.SystemImage,System.String)">
             <summary>
             Simple method wrapper to help with displaying system images
             </summary>
             <param name="systemImage"></param>
             <param name="layer"></param>
         </member>
-        <member name="M:SkillTools.Assets.AssetWrapper.PlaySystemSound(SkillTools.Assets.SystemSound)">
+        <member name="M:SkillTools.AssetTools.AssetWrapper.PlaySystemSound(SkillTools.AssetTools.SystemSound)">
             <summary>
             Simple method wrapper to help with playing system audio
             </summary>
         </member>
-        <member name="M:SkillTools.Assets.AssetWrapper.PlaySystemSound(SkillTools.Assets.SystemSound,System.Int32)">
+        <member name="M:SkillTools.AssetTools.AssetWrapper.PlaySystemSound(SkillTools.AssetTools.SystemSound,System.Int32)">
             <summary>
             Simple wrapper method to help with playing system audio
             </summary>
         </member>
-        <member name="M:SkillTools.Assets.AssetWrapper.LoadAssets(System.Boolean)">
+        <member name="M:SkillTools.AssetTools.AssetWrapper.LoadAssets(System.Boolean,Windows.Storage.StorageFolder)">
             <summary>
-            Attempts to load image, video and audio assets in the project's 'Assets/SkillAssets' folder to the robot's system
+            Attempts to load image, video and audio assets in the project's 'Assets/SkillAssets' folder, or the overridden storage folder, to the robot's system
             </summary>
-            <param name="forceReload"></param>
+            <param name="forceReload">force the system to upload all assets, whether they exist or not</param>
+            <param name="assetFolder">pass in to override the default location</param>
             <returns></returns>
         </member>
-        <member name="P:SkillTools.Assets.IAssetWrapper.ImageList">
+        <member name="T:SkillTools.AssetTools.IAssetWrapper">
+            <summary>
+            Asset wrapper to help with asset specific capabilities
+            </summary>
+        </member>
+        <member name="P:SkillTools.AssetTools.IAssetWrapper.ImageList">
             <summary>
             Current Image List 
             May be slightly incorrect if new images have been pushed to robot from another source
             </summary>
         </member>
-        <member name="P:SkillTools.Assets.IAssetWrapper.AudioList">
+        <member name="P:SkillTools.AssetTools.IAssetWrapper.AudioList">
             Current Audio List 
             May be slightly incorrect if new audio files have been pushed to robot from another source
         </member>
-        <member name="P:SkillTools.Assets.IAssetWrapper.VideoList">
+        <member name="P:SkillTools.AssetTools.IAssetWrapper.VideoList">
             Current video List 
             May be slightly incorrect if new videos have been pushed to robot from another source
         </member>
-        <member name="M:SkillTools.Assets.IAssetWrapper.RefreshAssetLists">
+        <member name="M:SkillTools.AssetTools.IAssetWrapper.RefreshAssetLists">
             <summary>
             Will request the asset lists from the robot and update the skills info
             </summary>
             <returns></returns>
         </member>
-        <member name="M:SkillTools.Assets.IAssetWrapper.ShowSystemImage(SkillTools.Assets.SystemImage)">
+        <member name="M:SkillTools.AssetTools.IAssetWrapper.ShowSystemImage(SkillTools.AssetTools.SystemImage)">
             <summary>
             Simple method wrapper to help with displaying system images
             </summary>
             <param name="systemImage"></param>
         </member>
-        <member name="M:SkillTools.Assets.IAssetWrapper.ShowSystemImage(SkillTools.Assets.SystemImage,System.String)">
+        <member name="M:SkillTools.AssetTools.IAssetWrapper.ShowSystemImage(SkillTools.AssetTools.SystemImage,System.String)">
             <summary>
             Simple method wrapper to help with displaying system images
             </summary>
             <param name="systemImage"></param>
             <param name="layer"></param>
         </member>
-        <member name="M:SkillTools.Assets.IAssetWrapper.PlaySystemSound(SkillTools.Assets.SystemSound)">
+        <member name="M:SkillTools.AssetTools.IAssetWrapper.PlaySystemSound(SkillTools.AssetTools.SystemSound)">
             <summary>
             Simple method wrapper to help with playing system audio
             </summary>
         </member>
-        <member name="M:SkillTools.Assets.IAssetWrapper.PlaySystemSound(SkillTools.Assets.SystemSound,System.Int32)">
+        <member name="M:SkillTools.AssetTools.IAssetWrapper.PlaySystemSound(SkillTools.AssetTools.SystemSound,System.Int32)">
             <summary>
             Simple wrapper method to help with playing system audio
             </summary>
         </member>
-        <member name="M:SkillTools.Assets.IAssetWrapper.LoadAssets(System.Boolean)">
+        <member name="M:SkillTools.AssetTools.IAssetWrapper.LoadAssets(System.Boolean,Windows.Storage.StorageFolder)">
             <summary>
-            Attempts to load image, video and audio assets in the project's 'Assets/SkillAssets' folder to the robot's system
+            Attempts to load image, video and audio assets in the project's 'Assets/SkillAssets' folder, or the overridden storage folder, to the robot's system
             </summary>
-            <param name="forceReload">if true, will reload all images in the folder, overwriting any existing</param>
+            <param name="forceReload">force the system to upload all assets, whether they exist or not</param>
+            <param name="assetFolder">pass in to override the default location</param>
             <returns></returns>
         </member>
-        <member name="T:SkillTools.Assets.SystemImage">
+        <member name="T:SkillTools.AssetTools.SystemImage">
             <summary>
             Default system images
             </summary>
         </member>
-        <member name="T:SkillTools.Assets.SystemSound">
+        <member name="T:SkillTools.AssetTools.SystemSound">
             <summary>
             Default system sounds
             </summary>
@@ -149,8 +156,6 @@
         <member name="T:SkillTools.DataStorage.BasicStorage">
             <summary>
             Basic data store for long terms storage of skill data
-            IMPORTANT! These are helper data storage classes and are readable and minimally encrypted
-            If you need better security, you may need to write your own
             </summary>
         </member>
         <member name="M:SkillTools.DataStorage.BasicStorage.LoadDataAsync">

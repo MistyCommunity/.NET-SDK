@@ -7,7 +7,7 @@ using MistyRobotics.Common.Types;
 using MistyRobotics.SDK;
 using MistyRobotics.SDK.Events;
 using MistyRobotics.SDK.Messengers;
-using SkillTools.Assets;
+using SkillTools.AssetTools;
 
 namespace GrossMisty
 {

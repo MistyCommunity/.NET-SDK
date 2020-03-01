@@ -1,4 +1,4 @@
-﻿namespace SkillTools.Assets
+﻿namespace SkillTools.AssetTools
 {
 	/// <summary>
 	/// Default system sounds

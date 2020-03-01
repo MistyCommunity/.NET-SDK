@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MistyRobotics.Common.Data;
+using Windows.Storage;
 
-namespace SkillTools.Assets
+namespace SkillTools.AssetTools
 {
+	/// <summary>
+	/// Asset wrapper to help with asset specific capabilities
+	/// </summary>
 	public interface IAssetWrapper
 	{
 		/// <summary>
@@ -50,10 +54,11 @@ namespace SkillTools.Assets
 		void PlaySystemSound(SystemSound sound, int volume);
 
 		/// <summary>
-		/// Attempts to load image, video and audio assets in the project's 'Assets/SkillAssets' folder to the robot's system
+		/// Attempts to load image, video and audio assets in the project's 'Assets/SkillAssets' folder, or the overridden storage folder, to the robot's system
 		/// </summary>
-		/// <param name="forceReload">if true, will reload all images in the folder, overwriting any existing</param>
+		/// <param name="forceReload">force the system to upload all assets, whether they exist or not</param>
+		/// <param name="assetFolder">pass in to override the default location</param>
 		/// <returns></returns>
-		Task LoadAssets(bool forceReload = false);
+		Task LoadAssets(bool forceReload = false, StorageFolder assetFolder = null);
 	}
 }
