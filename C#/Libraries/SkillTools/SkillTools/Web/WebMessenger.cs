@@ -15,7 +15,7 @@ namespace SkillTools.Web
 		private const string LoggingStartString = "Misty Robotics [••] WebMessenger : ";
 
 		/// <summary>
-		/// Static method to make a GET request to an external endpoint
+		/// Method to make a GET request to an external endpoint
 		/// </summary>
 		/// <param name="endpoint">the endpoint to call</param>
 		/// <returns></returns>
@@ -71,7 +71,7 @@ namespace SkillTools.Web
 		}
 
 		/// <summary>
-		/// Static method to make an http POST request to an external endpoint
+		/// Method to make an http POST request to an external endpoint
 		/// </summary>
 		/// <param name="endpoint">the endpoint to call</param>
 		/// <param name="data">data to send</param>
@@ -83,7 +83,7 @@ namespace SkillTools.Web
 		}
 
 		/// <summary>
-		/// Static method to make an http DELETE request to an external endpoint
+		/// Method to make an http DELETE request to an external endpoint
 		/// </summary>
 		/// <param name="endpoint">the endpoint to call</param>
 		/// <param name="data">data to send</param>
@@ -95,7 +95,7 @@ namespace SkillTools.Web
 		}
 
 		/// <summary>
-		/// Static method to make an http PATCH request to an external endpoint
+		/// Method to make an http PATCH request to an external endpoint
 		/// </summary>
 		/// <param name="endpoint">the endpoint to call</param>
 		/// <param name="data">data to send</param>
@@ -107,7 +107,7 @@ namespace SkillTools.Web
 		}
 
 		/// <summary>
-		/// Static method to make an http PUT request to an external endpoint
+		/// Method to make an http PUT request to an external endpoint
 		/// </summary>
 		/// <param name="endpoint">the endpoint to call</param>
 		/// <param name="data">data to send</param>
