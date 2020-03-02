@@ -95,7 +95,7 @@ namespace SkillTools.AssetTools
 
 				//Load the assets in the Assets/SkillAssets folder to the robot if they are missing or if ReloadAssets is passed in
 				StorageFolder skillAssetFolder = assetFolder ?? await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync(@"Assets\SkillAssets");
-				IList<StorageFile> assetFileList = (await assetFolder.GetFilesAsync()).ToList();
+				IList<StorageFile> assetFileList = (await skillAssetFolder.GetFilesAsync()).ToList();
 				foreach (StorageFile storageFile in assetFileList)
 				{
 					if (forceReload ||
@@ -103,7 +103,7 @@ namespace SkillTools.AssetTools
 						!ImageList.Any(x => x.Name == storageFile.Name) &&
 						!VideoList.Any(x => x.Name == storageFile.Name)))
 					{
-						StorageFile file = await assetFolder.GetFileAsync(storageFile.Name);
+						StorageFile file = await skillAssetFolder.GetFileAsync(storageFile.Name);
 						IRandomAccessStreamWithContentType stream = await file.OpenReadAsync();
 						byte[] contents = new byte[stream.Size];
 						await stream.AsStream().ReadAsync(contents, 0, contents.Length);
