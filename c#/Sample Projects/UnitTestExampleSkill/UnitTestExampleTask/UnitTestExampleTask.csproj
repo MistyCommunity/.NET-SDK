@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{1B2C62FE-683B-4378-98A7-03B3572AC108}</ProjectGuid>
+    <ProjectGuid>{B9B2E915-93B7-42BA-9557-A79AD9D308E9}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MoqExampleTask</RootNamespace>
-    <AssemblyName>MoqExampleTask</AssemblyName>
+    <RootNamespace>UnitTestExampleTask</RootNamespace>
+    <AssemblyName>UnitTestExampleTask</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
@@ -18,7 +18,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AllowCrossPlatformRetargeting>false</AllowCrossPlatformRetargeting>
-    <PackageCertificateKeyFile>MoqExampleTask_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>UnitTestExampleTask_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxPackage>true</AppxPackage>
     <ContainsStartupTask>true</ContainsStartupTask>
   </PropertyGroup>
@@ -102,7 +102,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="MoqExampleTask_TemporaryKey.pfx" />
+    <None Include="UnitTestExampleTask_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\Default.rd.xml" />
@@ -137,9 +137,6 @@
     </PackageReference>
     <PackageReference Include="MistyRobotics.SDK">
       <Version>0.9.41-beta</Version>
-    </PackageReference>
-    <PackageReference Include="MistyRobotics.Tools">
-      <Version>0.8.9-beta</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

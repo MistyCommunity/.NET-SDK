@@ -2,7 +2,7 @@ using BasicMoqSkill;
 using MistyRobotics.SDK.Messengers;
 using Windows.ApplicationModel.Background;
 
-namespace MoqExampleTask
+namespace UnitTestExampleTask
 {
     public sealed class StartupTask : IBackgroundTask
     {

@@ -1,15 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MistyRobotics.Common;
-using MistyRobotics.SDK.Commands;
 using MistyRobotics.Common.Data;
 using MistyRobotics.SDK.Events;
 using MistyRobotics.SDK.Responses;
-using MistyRobotics.Common.Types;
 using MistyRobotics.SDK;
 using MistyRobotics.SDK.Messengers;
 
@@ -19,7 +13,7 @@ namespace BasicMoqSkill
 	{
 		private IRobotMessenger _misty;
 
-		public INativeRobotSkill Skill { get; private set; } = new NativeRobotSkill("MoqExampleTask", "e60853e9-55cd-408b-9343-8cb746527289");
+		public INativeRobotSkill Skill { get; private set; } = new NativeRobotSkill("MoqExample", "e60853e9-55cd-408b-9343-8cb746527289");
 
 		public void LoadRobotConnection(IRobotMessenger robotInterface)
 		{
@@ -31,8 +25,9 @@ namespace BasicMoqSkill
 			//callback example
 			_misty.ChangeLED(255, 36, 0, OnResponse);
 			_misty.Wait(2000);
-			//second callback
-			_misty.ChangeLED(255, 36, 0, OnResponse);
+
+			//second callback example
+			_misty.ChangeLED(0, 36, 255, OnResponse);
 			_misty.Wait(1500);
 
 			//async example
@@ -51,22 +46,12 @@ namespace BasicMoqSkill
 		{
 			OnStart(sender, parameters);
 		}
-
-		/// <summary>
-		/// This event handler is called when the cancel command is issued from the robot/user
-		/// You currently have a few seconds to do cleanup and robot resets before the skill is shut down... 
-		/// Events will be unregistered for you 
-		/// </summary>
+		
 		public async void OnCancel(object sender, IDictionary<string, object> parameters)
 		{
 			await _misty.ChangeLEDAsync(0, 0, 0);
 		}
-
-		/// <summary>
-		/// This event handler is called when the skill timeouts
-		/// You currently have a few seconds to do cleanup and robot resets before the skill is shut down... 
-		/// Events will be unregistered for you 
-		/// </summary>
+		
 		public void OnTimeout(object sender, IDictionary<string, object> parameters)
 		{
 			_misty.ChangeLED(0, 0, 0, OnResponse);
@@ -79,24 +64,9 @@ namespace BasicMoqSkill
 
 		public void BumpCallback(IBumpSensorEvent bumpEvent)
 		{
-			//Only processing contacted events
-			if (bumpEvent.IsContacted)
-			{
-				switch (bumpEvent.SensorPosition)
-				{
-					case BumpSensorPosition.FrontRight:
-						break;
-					case BumpSensorPosition.FrontLeft:
-						break;
-					case BumpSensorPosition.BackRight:
-						break;
-					case BumpSensorPosition.BackLeft:
-						break;
-				}
-			}
+			//TODO - In a real skill we would do something with bump event...
 		}
-
-
+		
 		#region IDisposable Support
 		private bool _isDisposed = false;
 

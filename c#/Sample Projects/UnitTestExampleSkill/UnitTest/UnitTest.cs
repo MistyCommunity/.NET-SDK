@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
+using BasicMoqSkill;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MistyRobotics.Common.Types;
-using MistyRobotics.SDK;
 using MistyRobotics.SDK.Events;
-using MistyRobotics.SDK.Logger;
 using MistyRobotics.SDK.Messengers;
 using MistyRobotics.SDK.Responses;
 using Moq;
-using BasicMoqSkill;
 
 namespace UnitTest
 {
@@ -22,7 +19,7 @@ namespace UnitTest
 		private int _bumpEventCount = 0;
 
 		[TestMethod]
-        public void TestOnStartAndOnCancel()
+        public void TestOnStart()
 		{
 			_changeLedAsyncCount = 0;
 			_changeLedCount = 0;
@@ -69,25 +66,20 @@ namespace UnitTest
 			});
 
 			//Setup mock to ensure Change LED Async has been called the appropriate amount of times
-			robotMessengerMock.SetupSequence
+			robotMessengerMock.Setup
 			(
 				x => x.ChangeLEDAsync
 				(
-					It.IsAny<uint>(), 
-					It.IsAny<uint>(), 
+					It.IsAny<uint>(),
+					It.IsAny<uint>(),
 					It.IsAny<uint>()
 				)
 			).Returns(Task.Factory.StartNew(() =>
 			{
-				_changeLedAsyncCount = 2;
-				return successfulActionResponse;
-			}).AsAsyncOperation())
-			.Returns(Task.Factory.StartNew(() =>
-			{
-				_changeLedAsyncCount = 1;
+				++_changeLedAsyncCount;
 				return successfulActionResponse;
 			}).AsAsyncOperation());
-
+		
 			//Setup mock to ensure Change LED has been called the appropriate amount of times
 			robotMessengerMock.Setup
 			(
@@ -100,7 +92,7 @@ namespace UnitTest
 				)
 			).Callback(() =>
 			{
-				_changeLedCount++;
+				++_changeLedCount;
 				moqExampleSkill.OnResponse(successfulActionResponse);
 			});
 
@@ -113,9 +105,9 @@ namespace UnitTest
 				)
 			).Callback(() =>
 				{
-					_bumpEventCount++;
+					++_bumpEventCount;
 					moqExampleSkill.BumpCallback(bumpEvent1);
-					_bumpEventCount++;
+					++_bumpEventCount;
 					Task.WaitAll(Task.Delay(2000));
 					moqExampleSkill.BumpCallback(bumpEvent2);
 				}
@@ -125,6 +117,7 @@ namespace UnitTest
 			moqExampleSkill.LoadRobotConnection(robotMessengerMock.Object);
 
 			//OnStart will trigger the skill's action
+			//RegisterBumpSensorEvent will cause two simulated bump events to be fired when called
 			moqExampleSkill.OnStart(this, null);
 
 			//If my skill looped forever and I wanted to check data at intervals I might do this...
@@ -134,16 +127,45 @@ namespace UnitTest
 			//Test
 			Assert.IsTrue(_bumpEventCount == 2);
 			Assert.IsTrue(_changeLedAsyncCount == 1);
-			Assert.IsTrue(_changeLedCount == 2);
+			Assert.IsTrue(_changeLedCount == 2);			
+		}
 
+		[TestMethod]
+		public void TestOnCancel()
+		{
+			_changeLedAsyncCount = 0;		
+			Mock<IRobotMessenger> robotMessengerMock = new Mock<IRobotMessenger>();
+			MoqExampleSkill moqExampleSkill = new MoqExampleSkill();
 			
-			//Mimic cancel call
+			IRobotCommandResponse successfulActionResponse = new RobotCommandResponse
+			{
+				ResponseType = MessageType.ActionResponse,
+				Status = ResponseStatus.Success
+			};
+			
+			//Setup mock to ensure Change LED Async has been called the appropriate amount of times
+			robotMessengerMock.Setup
+			(
+				x => x.ChangeLEDAsync
+				(
+					It.IsAny<uint>(),
+					It.IsAny<uint>(),
+					It.IsAny<uint>()
+				)
+			).Returns(Task.Factory.StartNew(() =>
+			{
+				++_changeLedAsyncCount;
+				return successfulActionResponse;
+			}).AsAsyncOperation());
+
+			//Load mock messenger into skill
+			moqExampleSkill.LoadRobotConnection(robotMessengerMock.Object);
+
+			//OnCancel will trigger the skill's cancellation
 			moqExampleSkill.OnCancel(this, null);
 
-			//test cancel actions
-			Assert.IsTrue(_bumpEventCount == 2);
-			Assert.IsTrue(_changeLedAsyncCount == 2);
-			Assert.IsTrue(_changeLedCount == 2);
+			//Test
+			Assert.IsTrue(_changeLedAsyncCount == 1);
 		}
 	}
 }
