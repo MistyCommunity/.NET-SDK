@@ -212,6 +212,10 @@ namespace MistySkillTypes
 			if (!_charging)
 			{
 				_misty.PlayAudio("s_Anger3.wav", 100, OnResponse);
+				await _skillHelper.DriveAsync(IDEAL_ALIGNMENT_DISTANCE - 0.1);
+				if (_abort) return false;
+				await _skillHelper.TurnAsync(180);
+				_chargerPose = null;
 				return false;
 			}
 
