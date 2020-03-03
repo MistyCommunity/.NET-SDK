@@ -26,7 +26,7 @@ namespace UnitTest
 			_bumpEventCount = 0;
 
 			Mock<IRobotMessenger> robotMessengerMock = new Mock<IRobotMessenger>();			
-			MoqExampleSkill moqExampleSkill = new MoqExampleSkill();
+			UnitTestExampleSkill moqExampleSkill = new UnitTestExampleSkill();
 
 			IBumpSensorEvent bumpEvent1 = new BumpSensorEvent
 			{
@@ -135,7 +135,7 @@ namespace UnitTest
 		{
 			_changeLedAsyncCount = 0;		
 			Mock<IRobotMessenger> robotMessengerMock = new Mock<IRobotMessenger>();
-			MoqExampleSkill moqExampleSkill = new MoqExampleSkill();
+			UnitTestExampleSkill moqExampleSkill = new UnitTestExampleSkill();
 			
 			IRobotCommandResponse successfulActionResponse = new RobotCommandResponse
 			{

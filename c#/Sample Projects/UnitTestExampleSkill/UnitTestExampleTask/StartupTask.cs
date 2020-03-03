@@ -8,7 +8,7 @@ namespace UnitTestExampleTask
     {
         public void Run(IBackgroundTaskInstance taskInstance)
         {
-            RobotMessenger.LoadAndPrepareSkill(taskInstance, new MoqExampleSkill());
+            RobotMessenger.LoadAndPrepareSkill(taskInstance, new UnitTestExampleSkill());
         }
     }
 }

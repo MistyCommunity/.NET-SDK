@@ -9,11 +9,11 @@ using MistyRobotics.SDK.Messengers;
 
 namespace BasicMoqSkill
 {
-	public sealed class MoqExampleSkill : IMistySkill
+	public sealed class UnitTestExampleSkill : IMistySkill
 	{
 		private IRobotMessenger _misty;
 
-		public INativeRobotSkill Skill { get; private set; } = new NativeRobotSkill("MoqExample", "e60853e9-55cd-408b-9343-8cb746527289");
+		public INativeRobotSkill Skill { get; private set; } = new NativeRobotSkill("UnitTestExample", "e60853e9-55cd-408b-9343-8cb746527289");
 
 		public void LoadRobotConnection(IRobotMessenger robotInterface)
 		{
