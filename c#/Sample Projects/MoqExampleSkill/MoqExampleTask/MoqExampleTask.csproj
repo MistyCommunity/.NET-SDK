@@ -143,9 +143,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MoqExample\MoqExample.csproj">
-      <Project>{4ebd37c9-7112-4615-b1bd-997a1664abbf}</Project>
-      <Name>MoqExample</Name>
+    <ProjectReference Include="..\BasicMoqSkill\BasicMoqSkill.csproj">
+      <Project>{44a9d927-2d3d-4fa5-ba22-196fa6e482f3}</Project>
+      <Name>BasicMoqSkill</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0' ">

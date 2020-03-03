@@ -13,7 +13,7 @@ using MistyRobotics.Common.Types;
 using MistyRobotics.SDK;
 using MistyRobotics.SDK.Messengers;
 
-namespace MoqExampleTask
+namespace BasicMoqSkill
 {
 	public sealed class MoqExampleSkill : IMistySkill
 	{
@@ -28,9 +28,17 @@ namespace MoqExampleTask
 
 		public async void OnStart(object sender, IDictionary<string, object> parameters)
 		{
+			//callback example
 			_misty.ChangeLED(255, 36, 0, OnResponse);
 			_misty.Wait(2000);
+			//second callback
+			_misty.ChangeLED(255, 36, 0, OnResponse);
+			_misty.Wait(1500);
+
+			//async example
 			await _misty.ChangeLEDAsync(255, 140, 0);
+
+			//event registration
 			_misty.RegisterBumpSensorEvent(BumpCallback, 0, true, null, null, null);
 		}
 
@@ -49,9 +57,9 @@ namespace MoqExampleTask
 		/// You currently have a few seconds to do cleanup and robot resets before the skill is shut down... 
 		/// Events will be unregistered for you 
 		/// </summary>
-		public void OnCancel(object sender, IDictionary<string, object> parameters)
+		public async void OnCancel(object sender, IDictionary<string, object> parameters)
 		{
-			_misty.ChangeLED(0, 0, 0, OnResponse);
+			await _misty.ChangeLEDAsync(0, 0, 0);
 		}
 
 		/// <summary>
