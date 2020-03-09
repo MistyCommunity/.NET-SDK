@@ -1,0 +1,24 @@
+{
+	"misty_dsd_settings": {
+		"reflector_bot_left": [
+			-0.08394,
+			-0.02927,
+			0.14884
+		],
+		"reflector_bot_right": [
+			0.08394,
+			-0.02927,
+			0.14884
+		],
+		"reflector_top_left": [
+			-0.08168,
+			-0.09421,
+			0.15450
+		],
+		"reflector_top_right": [
+			0.08168,
+			-0.09421,
+			0.15450
+		]
+	}
+}
