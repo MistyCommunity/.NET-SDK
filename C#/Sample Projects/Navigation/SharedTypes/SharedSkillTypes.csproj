@@ -121,7 +121,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ChargerDock.cs" />
-    <Compile Include="ChargerDock2.cs" />
     <Compile Include="FollowPath.cs" />
     <Compile Include="MapNav.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

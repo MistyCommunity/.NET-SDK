@@ -142,6 +142,7 @@ namespace MistySkillTypes
 					if (encoderValues.Length > 1) // encoder values should be arriving at 5Hz.
 					{
 						double distanceDriven = Math.Abs(encoderValues[encoderValues.Length - 1] / 1000.0);
+						//LogMessage($"Distance driven: {distanceDriven}.");
 						if (distanceDriven > Math.Abs(0.99 * distance) ||
 						   Math.Abs(distanceDriven - Math.Abs(distance)) < 0.1)
 						{
@@ -155,7 +156,7 @@ namespace MistySkillTypes
 							{
 								// We've stopped due to a hazard. Wait a bit for it to go away.
 								LogMessage("Drive command paused for hazard.");
-								_misty.PlayAudio("s_Anger.wav", 100, OnResponse);
+								_misty.PlayAudio("s_anger.wav", 100, OnResponse);
 								int maxHazardWait = 0;
 								while (_stopHazardState && maxHazardWait++ < 30)
 								{
@@ -178,9 +179,11 @@ namespace MistySkillTypes
 									sendCommand = true;
 								}
 							}
-							if (encoderValues[encoderValues.Length - 1] == 0)
+							if (encoderValues.Length > 2 && Math.Abs(encoderValues[encoderValues.Length - 1] - encoderValues[encoderValues.Length - 2]) < 0.0001)
 							{
 								// Encoder value not changing. Need to send drive command again.
+								LogMessage($"Encoder values not changing. Distance driven so far is {distanceDriven}.");
+								distance -= encoderValues[encoderValues.Length - 1] / 1000.0;
 								sendCommand = true;
 							}
 						}
