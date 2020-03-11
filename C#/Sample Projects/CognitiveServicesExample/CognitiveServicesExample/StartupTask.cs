@@ -2,7 +2,7 @@ using MistyRobotics.Common.Types;
 using MistyRobotics.SDK.Messengers;
 using Windows.ApplicationModel.Background;
 
-namespace MistyRobotics.ExternalCallSkill
+namespace CognitiveServicesExample
 {
     public sealed class StartupTask : IBackgroundTask
     {

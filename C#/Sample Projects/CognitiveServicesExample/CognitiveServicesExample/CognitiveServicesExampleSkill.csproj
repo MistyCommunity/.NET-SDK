@@ -7,8 +7,8 @@
     <ProjectGuid>{A61893C3-5AB1-4A3A-9B7E-4BA4DD878698}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MistyRobotics.ExternalCallSkill</RootNamespace>
-    <AssemblyName>MistyRobotics.ExternalCallSkill</AssemblyName>
+    <RootNamespace>CognitiveServicesExample</RootNamespace>
+    <AssemblyName>CognitiveServicesExample</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>

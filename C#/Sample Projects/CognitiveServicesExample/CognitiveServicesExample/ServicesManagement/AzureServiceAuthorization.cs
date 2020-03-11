@@ -1,4 +1,4 @@
-﻿namespace MistyRobotics.ExternalCallSkill.ServicesManagement
+﻿namespace CognitiveServicesExample.ServicesManagement
 {
 	/// <summary>
 	/// Subscription authorization information

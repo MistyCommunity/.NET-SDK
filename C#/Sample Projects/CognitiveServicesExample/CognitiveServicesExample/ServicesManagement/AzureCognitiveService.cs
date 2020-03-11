@@ -12,7 +12,7 @@ using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.CognitiveServices.Speech.Translation;
 using Windows.Storage;
 
-namespace MistyRobotics.ExternalCallSkill.ServicesManagement
+namespace CognitiveServicesExample.ServicesManagement
 {
 	/// <summary>
 	/// Wrapper class for Azure Cognitive Services

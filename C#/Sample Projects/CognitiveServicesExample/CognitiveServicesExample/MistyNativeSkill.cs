@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MistyRobotics.Common.Data;
-using MistyRobotics.ExternalCallSkill.ServicesManagement;
+using CognitiveServicesExample.ServicesManagement;
 using MistyRobotics.SDK.Responses;
 using MistyRobotics.SDK;
 using MistyRobotics.SDK.Messengers;
@@ -15,7 +15,7 @@ using Microsoft.CognitiveServices.Speech.Translation;
 using Newtonsoft.Json;
 using SkillTools.AssetTools;
 
-namespace MistyRobotics.ExternalCallSkill
+namespace CognitiveServicesExample
 {
 	/// <summary>
 	/// Skill to show examples of using Azure Cognitive Services with Misty
@@ -90,11 +90,12 @@ namespace MistyRobotics.ExternalCallSkill
 		/// <summary>
 		/// Skill details for the robot		
 		/// </summary>
-		public INativeRobotSkill Skill { get; private set; } = new NativeRobotSkill("ExternalCallSkill", "8f9abb90-b558-4458-8e11-1b67de1e0d42")
+		public INativeRobotSkill Skill { get; private set; } = 
+			new NativeRobotSkill("CognitiveServicesExample", "ed3c8500-8d2c-44f6-835a-e74695f6a028")
 		{
 			TimeoutInSeconds = int.MaxValue,
 			AllowedCleanupTimeInMs = 6000,
-			StartupRules = new List<NativeStartupRule> { NativeStartupRule.Manual, NativeStartupRule.Startup }
+			StartupRules = new List<NativeStartupRule> { NativeStartupRule.Manual }
 		};
 
 		/// <summary>
@@ -159,7 +160,9 @@ namespace MistyRobotics.ExternalCallSkill
 				if (!_misty.Wait(1500)) { return; }
 
 				BroadcastDetails("Hello!  How are you?", _defaultVoice);
-				await _misty.TransitionLEDAsync(255, 0, 0, 0,0, 255, LEDTransition.TransitOnce, 1000);
+				await _misty.TransitionLEDAsync(255, 0, 0, 0,0, 255, LEDTransition.Breathe, 500);
+				_misty.Wait(1500);
+				await _misty.TransitionLEDAsync(0, 0, 255, 255, 140, 0, LEDTransition.Breathe, 1000);
 
 				/*	
 				//Test code to describe a random image at this URL
