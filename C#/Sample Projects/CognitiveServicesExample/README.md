@@ -50,7 +50,7 @@ The options are...
 ```
 //Describe the scene
 {
- 	"Skill": "8f9abb90-b558-4458-8e11-1b67de1e0d42",
+ 	"Skill": "ed3c8500-8d2c-44f6-835a-e74695f6a028",
  	"EventName": "Describe",
 	"Payload" : {
  	}
@@ -58,7 +58,7 @@ The options are...
 
 //Listen and repeat
 {
- 	"Skill": "8f9abb90-b558-4458-8e11-1b67de1e0d42",
+ 	"Skill": "ed3c8500-8d2c-44f6-835a-e74695f6a028",
  	"EventName": "Repeat",
 	"Payload" : {
  	}
@@ -66,7 +66,7 @@ The options are...
 
 //Update settings payload example, you can set any of the optional fields shown above, but you cannot change auth at runtime 
  {
- 	"Skill": "8f9abb90-b558-4458-8e11-1b67de1e0d42",
+ 	"Skill": "ed3c8500-8d2c-44f6-835a-e74695f6a028",
  	"EventName": "Update",
 	"Payload" : {
 		"DefaultVoice": "en-US-BenjaminRUS"
@@ -75,7 +75,7 @@ The options are...
 
 //Listen and translate
 {
- 	"Skill": "8f9abb90-b558-4458-8e11-1b67de1e0d42",
+ 	"Skill": "ed3c8500-8d2c-44f6-835a-e74695f6a028",
  	"EventName": "Translate",
 	"Payload" : {
  	}
@@ -83,7 +83,7 @@ The options are...
 
 //Text to Speech
 {
- 	"Skill": "8f9abb90-b558-4458-8e11-1b67de1e0d42",
+ 	"Skill": "ed3c8500-8d2c-44f6-835a-e74695f6a028",
  	"EventName": "Speak",
 	"Payload" : {
 		"Text": "What to say."
