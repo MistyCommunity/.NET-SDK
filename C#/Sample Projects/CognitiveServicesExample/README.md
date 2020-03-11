@@ -7,7 +7,6 @@ An example skill to show how you can use Microsoft's Cognitive Services.
 * `SpeechKey`
 * `SpeechRegion`
 * `SpeechEndpoint`
-
 * `VisionKey`
 * `VisionRegion`
 * `VisionEndpoint`
