@@ -18,7 +18,7 @@ This repository includes the following directories:
 
 Libraries, sample code, and runnable .NET skills for learning about Misty's .NET SDK. Includes:
 
-  **Libraries/SkillTools** - Library with helper functionality for HTTP requests, simple data stores, and assets management.
+  * **Libraries/SkillTools** - Library with helper functionality for HTTP requests, simple data stores, and assets management.
   * **Sample Projects** - Sample code and solutions with runnable .NET skills for experimenting with Misty and learning about the .NET SDK. Includes:
     * **AssetFunSkill** - Demonstrates how to automatically install assets if they do not already exist on Misty.
     * **CognitiveServicesExample** - Demonstrates how to use Microsoft's Cognitive Services in a C# skill.
