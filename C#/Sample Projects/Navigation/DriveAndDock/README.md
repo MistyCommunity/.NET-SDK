@@ -39,3 +39,10 @@ Known issues:
 - There is code to verify that dock detection has been enabled with the SLAM service. However, we have
 seen instances where it does not start correctly and we can't currently differentiate this failure
 from a scenario where the detection is working but Misty is not facing the charger.
+
+
+---
+
+*Copyright 2020 Misty Robotics*<br>
+*Licensed under the Apache License, Version 2.0*<br>
+*http://www.apache.org/licenses/LICENSE-2.0*
