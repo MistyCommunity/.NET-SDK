@@ -1,9 +1,10 @@
 # SharedTypes
 
+*This example was last tested on `robotVersion 1.13.0.10362`.*
+
 Classes that encapsulate functionality that could be shared across skills.
 
 This is prototype quality Misty skill code that represents one way to achieve certain functionality.
-
 
 ---
 

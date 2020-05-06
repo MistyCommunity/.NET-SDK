@@ -1,5 +1,7 @@
 # MoveArmsAndHead
 
+*This example was last tested on `robotVersion 	1.13.0.10362`.*
+
 A basic C# example skill that randomly moves the arms and head according to a pre-defined timer.
 
 Has two optional startup parameters that can be passed into the skill to adjust the arm and head pause between movements.
