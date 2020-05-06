@@ -33,7 +33,7 @@
 * 	 Please refer to the Misty Robotics End User License Agreement for further
 * 	 information and full details:
 * 	 	https://www.mistyrobotics.com/legal/end-user-license-agreement/
-******************************************************************************/–
+******************************************************************************/
 
 using System;
 using System.Collections.Generic;
