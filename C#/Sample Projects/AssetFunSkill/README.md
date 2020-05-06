@@ -1,5 +1,7 @@
 # AssetFun
 
+*This example was last tested on `robotVersion 1.13.0.10362`.*
+
 An example skill to show how you can automatically install assets from the C# skill if they do not exist on the robot.
 
 Has one optional startup parameter that can be passed into the skill to force it to update existing assets on the robot with the assets in the SkillAssets folder.

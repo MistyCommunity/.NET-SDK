@@ -1,5 +1,7 @@
 # TextToSpeech
 
+*This example was last tested on `robotVersion 1.13.0.10362`.*
+
 A basic C# example skill that shows how to use text to speech and user events.  
 
 Using the Skill Runner's advanced options for the skill, located under the skill's gear icon, you can trigger speech and display the text on the screen.

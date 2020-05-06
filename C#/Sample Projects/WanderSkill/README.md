@@ -1,5 +1,7 @@
 # WanderSkill
 
+*This example was last tested on `robotVersion 1.13.0.10362`.*
+
 A basic C# example skill that attempts to wander an area using its bump and time-of-flight sensors.
 
 Has two optional parameters.

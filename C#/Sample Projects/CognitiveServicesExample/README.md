@@ -1,5 +1,7 @@
 # Cognitive Services Example
 
+*This example was last tested on `robotVersion 1.13.0.10362`.*
+
 An example skill to show how you can use Microsoft's Cognitive Services.
 
 **Important:** You must [create a Speech Service and Vision Service with Azure Cognitive Services](https://docs.microsoft.com/en-us/azure/cognitive-services/cognitive-services-apis-create-account?tabs=multiservice%2Cwindows) before you run this skill. Then, the **first** time you start the skill, you must submit the key, region, and endpoint for your services as startup parameters in the [Skill Runner](http://sdk.mistyrobotics.com/skill-runner/index.html).  Click on the gear icon next to the skill name that appears in the **Manage** section once the skill is deployed to the robot. Add the key/value pairs below to the Additional Skill Parameters for your auth.
