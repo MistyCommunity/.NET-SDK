@@ -1,10 +1,9 @@
-# SharedTypes
+# SharedSkillTypes Library
 
-*This example was last tested on `robotVersion 1.13.0.10362`.*
+*This example was last tested on `robotVersion 1.24.10`.*
 
-Classes that encapsulate functionality that could be shared across skills.
-
-This is prototype quality Misty skill code that represents one way to achieve certain functionality.
+A collection of algorithms and helpers used by the DriveAndDock skill.
+Broken out separately for potential reuse with other skills.
 
 ---
 
