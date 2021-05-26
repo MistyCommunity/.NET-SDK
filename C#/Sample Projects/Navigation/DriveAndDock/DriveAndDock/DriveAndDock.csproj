@@ -20,6 +20,14 @@
     <AllowCrossPlatformRetargeting>false</AllowCrossPlatformRetargeting>
     <AppxPackage>true</AppxPackage>
     <ContainsStartupTask>true</ContainsStartupTask>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>arm</AppxBundlePlatforms>
+    <AppInstallerUpdateFrequency>1</AppInstallerUpdateFrequency>
+    <AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
+    <PackageCertificateThumbprint>AB547AD19BEF2A911E26B81A4A8B70DE797C3C36</PackageCertificateThumbprint>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -132,13 +140,13 @@
       <Version>6.2.9</Version>
     </PackageReference>
     <PackageReference Include="MistyRobotics.Common">
-      <Version>0.9.41-beta</Version>
+      <Version>0.9.226-beta</Version>
     </PackageReference>
     <PackageReference Include="MistyRobotics.SDK">
-      <Version>0.9.41-beta</Version>
+      <Version>0.9.226-beta</Version>
     </PackageReference>
     <PackageReference Include="MistyRobotics.Tools">
-      <Version>0.9.41-beta</Version>
+      <Version>0.9.226-beta</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

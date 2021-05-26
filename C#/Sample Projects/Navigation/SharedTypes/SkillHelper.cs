@@ -1,51 +1,50 @@
-﻿/******************************************************************************
-*    Copyright 2020 Misty Robotics, Inc.
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-* 
-* 	 **WARRANTY DISCLAIMER.**
-* 
-* 	 * General. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, MISTY
-* 	 ROBOTICS PROVIDES THIS SAMPLE SOFTWARE "AS-IS" AND DISCLAIMS ALL
-* 	 WARRANTIES AND CONDITIONS, WHETHER EXPRESS, IMPLIED, OR STATUTORY,
-* 	 INCLUDING THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-* 	 PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY, AND NON-INFRINGEMENT OF
-* 	 THIRD-PARTY RIGHTS. MISTY ROBOTICS DOES NOT GUARANTEE ANY SPECIFIC
-* 	 RESULTS FROM THE USE OF THIS SAMPLE SOFTWARE. MISTY ROBOTICS MAKES NO
-* 	 WARRANTY THAT THIS SAMPLE SOFTWARE WILL BE UNINTERRUPTED, FREE OF VIRUSES
-* 	 OR OTHER HARMFUL CODE, TIMELY, SECURE, OR ERROR-FREE.
-* 	 * Use at Your Own Risk. YOU USE THIS SAMPLE SOFTWARE AND THE PRODUCT AT
-* 	 YOUR OWN DISCRETION AND RISK. YOU WILL BE SOLELY RESPONSIBLE FOR (AND MISTY
-* 	 ROBOTICS DISCLAIMS) ANY AND ALL LOSS, LIABILITY, OR DAMAGES, INCLUDING TO
-* 	 ANY HOME, PERSONAL ITEMS, PRODUCT, OTHER PERIPHERALS CONNECTED TO THE PRODUCT,
-* 	 COMPUTER, AND MOBILE DEVICE, RESULTING FROM YOUR USE OF THIS SAMPLE SOFTWARE
-* 	 OR PRODUCT.
-* 
-* 	 Please refer to the Misty Robotics End User License Agreement for further
-* 	 information and full details:
-* 	 	https://www.mistyrobotics.com/legal/end-user-license-agreement/
-******************************************************************************/
+﻿/**********************************************************************
+	Copyright 2021 Misty Robotics
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+		http://www.apache.org/licenses/LICENSE-2.0
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+	**WARRANTY DISCLAIMER.**
+	* General. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, MISTY
+	ROBOTICS PROVIDES THIS SAMPLE SOFTWARE "AS-IS" AND DISCLAIMS ALL
+	WARRANTIES AND CONDITIONS, WHETHER EXPRESS, IMPLIED, OR STATUTORY,
+	INCLUDING THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+	PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY, AND NON-INFRINGEMENT OF
+	THIRD-PARTY RIGHTS. MISTY ROBOTICS DOES NOT GUARANTEE ANY SPECIFIC
+	RESULTS FROM THE USE OF THIS SAMPLE SOFTWARE. MISTY ROBOTICS MAKES NO
+	WARRANTY THAT THIS SAMPLE SOFTWARE WILL BE UNINTERRUPTED, FREE OF VIRUSES
+	OR OTHER HARMFUL CODE, TIMELY, SECURE, OR ERROR-FREE.
+	* Use at Your Own Risk. YOU USE THIS SAMPLE SOFTWARE AND THE PRODUCT AT
+	YOUR OWN DISCRETION AND RISK. YOU WILL BE SOLELY RESPONSIBLE FOR (AND MISTY
+	ROBOTICS DISCLAIMS) ANY AND ALL LOSS, LIABILITY, OR DAMAGES, INCLUDING TO
+	ANY HOME, PERSONAL ITEMS, PRODUCT, OTHER PERIPHERALS CONNECTED TO THE PRODUCT,
+	COMPUTER, AND MOBILE DEVICE, RESULTING FROM YOUR USE OF THIS SAMPLE SOFTWARE
+	OR PRODUCT.
+	Please refer to the Misty Robotics End User License Agreement for further
+	information and full details:
+		https://www.mistyrobotics.com/legal/end-user-license-agreement/
+**********************************************************************/
+#define DEBUG_MESSAGES
 
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Threading;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using MistyRobotics.SDK.Events;
 using MistyRobotics.SDK.Messengers;
 using MistyRobotics.SDK.Responses;
-using MistyRobotics.Tools.Web;
+using Windows.Graphics.Imaging;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
-namespace MistySkillTypes
+namespace MistyNavigation
 {
 	/// <summary>
 	/// Collection of generic skill helper methods.
@@ -58,10 +57,9 @@ namespace MistySkillTypes
 
 		private double _leftEncoderValue;
 		private ConcurrentQueue<double> _leftEncoderValues;
-		private TofValues _tofValues = new TofValues();
+		private DateTime _lastEncoderValue = DateTime.Now;
 		private bool _stopHazardState;
 		private bool _stopHazardLatching;
-		private SemaphoreSlim _headPositionSemaphore;
 		private HeadPosition _headPosition;
 		private bool _abort;
 
@@ -73,22 +71,26 @@ namespace MistySkillTypes
 		{
 			_misty = misty ?? throw new ArgumentNullException(nameof(misty));
 
+			LogMessage("SkillHelper initiating. Registering event callbacks for encoders and IMU.");
+
 			_misty.RegisterDriveEncoderEvent(EncoderEventCallback, 100, true, null, "SkillHelperEncoderEvent", OnResponse);
 			_misty.RegisterIMUEvent(ImuEventCallback, 100, true, null, "SkillHelperIMUEvent", OnResponse);
-			_misty.RegisterTimeOfFlightEvent(TofEventCallback, 0, true, null, "SkillHelperTofEventEvent", OnResponse);
-			_misty.RegisterHazardNotificationEvent(HazardEventCallback, 0, true, "SkillHelperHazardEvent", OnResponse);
+
+			// THE HAZARD HANDLING CODE IS CURRENTLY DISABLED
+			//_misty.RegisterHazardNotificationEvent(HazardEventCallback, 0, true, "SkillHelperHazardEvent", OnResponse);
 		}
 
 		public void LogMessage(string msg)
 		{
 			// Write to the skill log file and the console.
-			Debug.WriteLine(msg);
+			Debug.WriteLine(DateTime.Now + " " + msg);
 			_misty.SkillLogger.LogInfo(msg);
 		}
 
 		public void Abort()
 		{
 			_abort = true;
+			Cleanup();
 		}
 
 		public double ImuYaw { get; private set; }
@@ -96,6 +98,10 @@ namespace MistySkillTypes
 		public double ImuRoll { get; private set; }
 
 		public double ImuPitch { get; private set; }
+
+		public DateTime LastEncoderMessageReceived { get; private set; } = DateTime.MinValue;
+
+		public DateTime LastImuMessageReceived { get; private set; } = DateTime.MinValue;
 
 		/// <summary>
 		/// Drive straight for the specified distance in meters at a medium speed.
@@ -106,25 +112,32 @@ namespace MistySkillTypes
 		/// <param name="slow"></param>
 		public async Task<bool> DriveAsync(double distance, bool slow = false)
 		{
-			if (Math.Abs(distance) < 0.001)
+			if (Math.Abs(distance) < 0.003)
 			{
+				// Can't drive this short a distance
 				return true;
 			}
 
-			bool success = true;
+			if (DateTime.Now.Subtract(LastEncoderMessageReceived).TotalSeconds > 1)
+			{
+				LogMessage($"Cannot carry out a drive command because encoder messages are not being received. Last encoder message received at {LastEncoderMessageReceived}.");
+				MistySpeak("Encoder messages are not being received. Path following aborted.");
+				return false;
+			}
 
+			bool success = true;
 			try
 			{
-				// Clear encoder values.
-				int maxWait = 0;
-				while (_leftEncoderValue != 0 && maxWait++ < 10)
+				// Clear encoder values by sending a drive command with a distance of 0.
+				int encoderResets = 0;
+				while (_leftEncoderValue != 0 && encoderResets++ < 10)
 				{
 					_misty.DriveHeading(0, 0, 100, false, OnResponse);
-					await Task.Delay(200);
+					await Task.Delay(500);
 				}
 				if (_leftEncoderValue != 0)
 				{
-					LogMessage("Failed to reset encoder values.");
+					LogMessage($"Failed to reset encoder values. Last encoder value received at {LastEncoderMessageReceived} with a value of {_leftEncoderValue}.");
 					return false;
 				}
 
@@ -132,31 +145,34 @@ namespace MistySkillTypes
 				_stopHazardLatching = false;
 				bool driving = true;
 				bool sendCommand = true;
+				int duration = 0;
+				int retries = 0;
+				DateTime start = DateTime.Now;
 
-				maxWait = 0;
 				while (driving)
 				{
 					if (sendCommand)
 					{
 						// Arbitrary medium speed based upon distance.
-						int duration = (int)(500 + Math.Abs(distance) * 2500);
+						duration = (int)(500 + Math.Abs(distance) * 3000);
 						if (slow)
 						{
-							duration = 2 * duration;
+							duration = 3 * duration;
 						}
 
-						LogMessage($"Sending drive command with a distance of {distance:f3} meters and a duration of {duration} ms.");
 						while (!_leftEncoderValues.IsEmpty) // Clearing the encoder queue
 						{
 							_leftEncoderValues.TryDequeue(out double r);
 						}
+						LogMessage($"Sending drive command with a distance of {distance:f3} meters and a duration of {duration} ms.");
 						_misty.DriveHeading(0, Math.Abs(distance), duration, distance < 0, OnResponse);
+						start = DateTime.Now;
 						sendCommand = false;
 						await Task.Delay(1000);
 					}
 
 					if (_abort) return false;
-					await Task.Delay(1000);
+					await Task.Delay(1500);
 
 					// Check that we really moved and if we're done.
 					// Drive command could have been dropped and/or a hazard could have stopped the robot.
@@ -164,21 +180,20 @@ namespace MistySkillTypes
 					if (encoderValues.Length > 1) // encoder values should be arriving at 5Hz.
 					{
 						double distanceDriven = Math.Abs(encoderValues[encoderValues.Length - 1] / 1000.0);
-						//LogMessage($"Distance driven: {distanceDriven}.");
-						if (distanceDriven > Math.Abs(0.99 * distance) ||
-						   Math.Abs(distanceDriven - Math.Abs(distance)) < 0.1)
+						if (distanceDriven > Math.Abs(0.99 * distance) || Math.Abs(distanceDriven - Math.Abs(distance)) < 0.1)
 						{
 							LogMessage($"Completed drive with distance of {_leftEncoderValue / 1000.0:f3} meters.");
 							driving = false;
 						}
 						else
 						{
+							// THE FOLLOWING CODE AROUND HAZARDS IS CURRENTLY INACTIVE AS THE HAZARD SYSTEM IS DISABLED BY THE SKILL
 							// Not there yet. Everything progressing okay?
 							if (_stopHazardLatching)
 							{
 								// We've stopped due to a hazard. Wait a bit for it to go away.
 								LogMessage("Drive command paused for hazard.");
-								_misty.PlayAudio("s_anger.wav", 100, OnResponse);
+								_misty.PlayAudio("s_Anger.wav", 100, OnResponse);
 								int maxHazardWait = 0;
 								while (_stopHazardState && maxHazardWait++ < 30)
 								{
@@ -201,20 +216,34 @@ namespace MistySkillTypes
 									sendCommand = true;
 								}
 							}
-							if (encoderValues.Length > 2 && Math.Abs(encoderValues[encoderValues.Length - 1] - encoderValues[encoderValues.Length - 2]) < 0.0001)
+							if (encoderValues[encoderValues.Length - 1] == 0)
 							{
-								// Encoder value not changing. Need to send drive command again.
-								LogMessage($"Encoder values not changing. Distance driven so far is {distanceDriven}.");
-								distance -= encoderValues[encoderValues.Length - 1] / 1000.0;
-								sendCommand = true;
+								// Encoder values are not changing. Try sending drive command again.
+								if (retries++ > 5)
+								{
+									// Don't try forever.
+									LogMessage("Unable to complete drive command successfully.");
+									success = false;
+									driving = false;
+								}
+								else
+								{
+									sendCommand = true;
+								}
+							}
+							// Don't wait forever.
+							if (DateTime.Now.Subtract(start).TotalMilliseconds > (5 + 2 * duration))
+							{
+								LogMessage($"Time out waiting for completion of drive. Completed distance of {_leftEncoderValue / 1000.0:f3} meters.");
+								success = false;
+								driving = false;
 							}
 						}
 					}
 					else
 					{
-						// Something is wrong if we get here.
-						// For now, just continue and hope for the best :).
-						LogMessage("Not receiving encoder messages. Can't verify drive commands.");
+						LogMessage($"Not receiving encoder messages. Last encoder value recieved at {_lastEncoderValue}.");
+						success = false;
 					}
 				}
 			}
@@ -231,22 +260,6 @@ namespace MistySkillTypes
 			return success;
 		}
 
-		private void LogEncoderValues()
-		{
-			string s = "";
-
-			if (_leftEncoderValues != null)
-			{
-				foreach (var v in _leftEncoderValues)
-				{
-					s += ", " + v;
-				}
-				s = s.Substring(2);
-			}
-
-			LogMessage($"Encoder values are: {s}.");
-		}
-
 		/// <summary>
 		/// Turn N degrees at medium speed.
 		/// Confirm with IMU values and retry if needed.
@@ -255,8 +268,23 @@ namespace MistySkillTypes
 		/// <returns></returns>
 		public async Task<bool> TurnAsync(double degrees)
 		{
+			if (DateTime.Now.Subtract(LastImuMessageReceived).TotalSeconds > 1)
+			{
+				LogMessage($"Cannot carry out a turn command because IMU messages are not being received. Last IMU message received at {LastImuMessageReceived}.");
+				MistySpeak("IMU messages are not being received. Path following aborted.");
+				return false;
+			}
+
+			// Normalize degrees to be between -180 and 180.
+			degrees = degrees % 360;
+			if (degrees > 180)
+				degrees = degrees - 360;
+			else if (degrees < -180)
+				degrees = 360 + degrees;
+
 			if (Math.Abs(degrees) < 2)
 			{
+				// Can't turn that little.
 				return true;
 			}
 
@@ -264,20 +292,14 @@ namespace MistySkillTypes
 			bool success = true;
 			try
 			{
-				// Normalize degrees to be between -180 and 180.
-				degrees = degrees % 360;
-				if (degrees > 180)
-					degrees = 360 - degrees;
-				else if (degrees < -180)
-					degrees = 360 + degrees;
-
 				// Get medium speed duration.
 				int duration = (int)(500 + Math.Abs(degrees) * 4000.0 / 90.0);
 
 				// Send command
-				LogMessage($"Sending turn command for {degrees:f2} degrees in {duration} ms.");
+				LogMessage($"Sending turn command for {degrees:f1} degrees in {duration} ms.");
 				_misty.DriveArc(ImuYaw + degrees, 0, duration, false, OnResponse);
 				await Task.Delay(2000);
+				if (_abort) return false;
 
 				// Turns less then about 3 degrees don't do anything.
 				// So in that case don't bother checking or waiting any longer.
@@ -287,7 +309,7 @@ namespace MistySkillTypes
 					int retries = 0;
 					while (retries++ < 3 && Math.Abs(AngleDelta(ImuYaw, initialYaw)) < 1.0)
 					{
-						LogMessage($"Sending turn command for {degrees:f2} degrees in {duration} ms.");
+						LogMessage($"Sending turn command for {degrees:f1} degrees in {duration} ms.");
 						_misty.DriveArc(ImuYaw + degrees, 0, duration, false, OnResponse);
 						await Task.Delay(1000);
 						if (_abort) return false;
@@ -295,8 +317,8 @@ namespace MistySkillTypes
 
 					// Wait for turn to complete.
 					retries = 0;
-					double yawBefore = ImuYaw + 500;
-					while (Math.Abs(AngleDelta(ImuYaw, yawBefore)) > 1.0 && retries++ < 20)
+					double yawBefore = ImuYaw + 180;
+					while (Math.Abs(AngleDelta(yawBefore, ImuYaw)) > 1.0 && retries++ < 25)
 					{
 						yawBefore = ImuYaw;
 						await Task.Delay(500);
@@ -311,11 +333,126 @@ namespace MistySkillTypes
 				LogMessage("Exception occurred within TurnAsync: " + ex.Message);
 			}
 
-			LogMessage($"Completed turn of {AngleDelta(ImuYaw, initialYaw):f2} degrees.");
+			double turned = AngleDelta(initialYaw, ImuYaw);
+			if (Math.Abs(AngleDelta(turned, degrees)) > 5)
+			{
+				success = false;
+				LogMessage($"Only turned {turned:f1} degrees. Expected {degrees:f1} degrees.");
+				
+			}
+			else
+			{
+				success = true;
+				LogMessage($"Completed turn of {turned:f1} degrees.");
+			}
 
 			return success;
 		}
 
+		/// <summary>
+		/// Move head with retries if pitch isn't where we want it to be.
+		/// </summary>
+		public async Task MoveHeadAsync(double pitchDegrees, double rollDegrees, double yawDegrees)
+		{
+			_misty.RegisterActuatorEvent(ActuatorEventCallback, 0, true, null, "SkillHelperActuatorEventCallback", OnResponse);
+
+			LogMessage($"Move head: {pitchDegrees:f0}, {rollDegrees:f0}, {yawDegrees:f0}.");
+
+			_headPosition = new HeadPosition();
+			int retries = 0;
+			while ((!_headPosition.Pitch.HasValue || Math.Abs(_headPosition.Pitch.Value - pitchDegrees) > 3) && retries++ < 3)
+			{
+				_misty.MoveHead(pitchDegrees, rollDegrees, yawDegrees, 70, MistyRobotics.Common.Types.AngularUnit.Degrees, OnResponse);
+				await Task.Delay(3000); // totally arbitrary wait
+				if (_abort) break;
+			}
+
+			LogMessage($"Head position after move: {_headPosition.Pitch:f0}, {_headPosition.Roll:f0}, {_headPosition.Yaw:f0}.");
+
+			_misty.UnregisterEvent("SkillHelperActuatorEventCallback", OnResponse);
+		}
+
+		public void DisableHazardSystem()
+		{
+			_misty.UpdateHazardSettings(new MistyRobotics.Common.Data.HazardSettings()
+			{
+				DisableBumpSensors = true,
+				DisableTimeOfFlights = true
+			}, OnResponse);
+		}
+
+		public void EnableHazardSystem()
+		{
+			_misty.UpdateHazardSettings(new MistyRobotics.Common.Data.HazardSettings()
+			{
+				RevertToDefault = true
+			}, OnResponse);
+		}
+
+		public async Task TakePictureAsync(string fileName)
+		{
+			try
+			{
+				ITakePictureResponse response = await _misty.TakePictureAsync("sadf", false, false, true, 640, 480);
+				if (response.Status == MistyRobotics.Common.Types.ResponseStatus.Success)
+				{
+					StorageFolder sdkFolder = await StorageFolder.GetFolderFromPathAsync(@"c:\Data\Misty\SDK");
+					StorageFolder folder = null;
+					if (await sdkFolder.TryGetItemAsync("Images") == null)
+					{
+						folder = await sdkFolder.CreateFolderAsync("Images");
+					}
+					else
+					{
+						folder = await sdkFolder.GetFolderAsync("Images");
+					}
+
+					IBuffer buff = WindowsRuntimeBufferExtensions.AsBuffer(response.Data.Image.ToArray());
+					InMemoryRandomAccessStream ms = new InMemoryRandomAccessStream();
+					await ms.WriteAsync(buff);
+					BitmapDecoder decoder = await BitmapDecoder.CreateAsync(ms);
+					SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+					StorageFile file = await folder.CreateFileAsync(fileName);
+					using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
+					{
+						BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+						encoder.SetSoftwareBitmap(softwareBitmap);
+						await encoder.FlushAsync();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				LogMessage("Failed to save picture: " + ex.Message);
+			}
+		}
+
+		public void MistySpeak(string message)
+		{
+#if DEBUG_MESSAGES
+			try
+			{
+				_misty.Speak(message, true, "na", OnResponse);
+			}
+			catch (Exception) { }
+#endif
+		}
+
+#endregion
+
+#region Private Methods
+
+		private void Cleanup()
+		{
+			LogMessage("SkillHelper cleanup");
+			_misty?.UnregisterEvent("SkillHelperIMUEvent", OnResponse);
+			_misty?.UnregisterEvent("SkillHelperEncoderEvent", OnResponse);
+			//_misty.UnregisterEvent("SkillHelperHazardEvent", OnResponse);
+		}
+
+		/// <summary>
+		/// Compute the difference in degrees of going from angle1 to angle2.
+		/// </summary>
 		private double AngleDelta(double angle1, double angle2)
 		{
 			double a1 = angle1 % 360;
@@ -324,131 +461,11 @@ namespace MistySkillTypes
 			double a2 = angle2 % 360;
 			a2 = a2 >= 0 ? a2 : 360 + a2;
 
-			return a1 - a2;
-		}
+			double diff = a2 - a1;
+			diff = diff > 180 ? diff - 360 : diff;
+			diff = diff < -180 ? 360 + diff : diff;
 
-		public TofValues GetTofValues()
-		{
-			return _tofValues;
-		}
-
-		public async Task MoveHeadAsync(double pitchDegrees, double rollDegrees, double yawDegrees)
-		{
-			_misty.RegisterActuatorEvent(ActuatorEventCallback, 0, true, null, "SkillHelperActuatorEventCallback", OnResponse);
-
-			// We move head to non-final position first so that we can verify change in position.
-			double firstPitchDegrees = pitchDegrees + 10;
-			if (pitchDegrees > 0)
-			{
-				firstPitchDegrees = pitchDegrees - 10;
-			}
-			_misty.MoveHead(firstPitchDegrees, rollDegrees, yawDegrees, 70, MistyRobotics.Common.Types.AngularUnit.Degrees, OnResponse);
-			await Task.Delay(3000);
-
-			_headPosition = new HeadPosition();
-			_headPositionSemaphore = new SemaphoreSlim(0);
-			await _headPositionSemaphore.WaitAsync(5000);
-			double initPitch = _headPosition.Pitch.HasValue ? _headPosition.Pitch.Value : 100;
-			LogMessage($"Head position after pre-move: {_headPosition.Pitch:f2}, {_headPosition.Roll:f2}, {_headPosition.Yaw:f2}.");
-
-			// Now move head to final position.
-			_headPosition = new HeadPosition();
-			int retries = 0;
-			while ((!_headPosition.Pitch.HasValue || (_headPosition.Pitch.HasValue && initPitch != 100 && Math.Abs(_headPosition.Pitch.Value - initPitch) < 2)) && retries++ < 3)
-			{
-				_misty.MoveHead(pitchDegrees, rollDegrees, yawDegrees, 70, MistyRobotics.Common.Types.AngularUnit.Degrees, OnResponse);
-				await Task.Delay(5000);
-				if (_abort) break;
-
-				_headPositionSemaphore = new SemaphoreSlim(0);
-				await _headPositionSemaphore.WaitAsync(5000);
-				LogMessage($"Head position after move: {_headPosition.Pitch:f2}, {_headPosition.Roll:f2}, {_headPosition.Yaw:f2}.");
-			}
-
-			_misty.UnregisterEvent("SkillHelperActuatorEventCallback", OnResponse);
-		}
-
-		public async Task DisableHazardSystemAsync()
-		{
-			string endpoint = "http://10.10.10.10/api/hazard/updatebasesettings";
-
-			string data = "{\"timeOfFlightThresholds\":[" +
-				"{\"sensorName\":\"TOF_DownFrontRight\",\"threshold\":0}," +
-				"{\"sensorName\":\"TOF_DownFrontLeft\",\"threshold\":0}," +
-				"{\"sensorName\":\"TOF_DownBackRight\",\"threshold\":0}," +
-				"{\"sensorName\":\"TOF_DownBackLeft\",\"threshold\":0}," +
-				"{\"sensorName\":\"TOF_Right\",\"threshold\":0}," +
-				"{\"sensorName\":\"TOF_Left\",\"threshold\":0}," +
-				"{\"sensorName\":\"TOF_Center\",\"threshold\":0}," +
-				"{\"sensorName\":\"TOF_Back\",\"threshold\":0}]," +
-				"\"bumpSensorsEnabled\":[" +
-				"{\"sensorName\":\"Bump_FrontRight\",\"enabled\":false}," +
-				"{\"sensorName\":\"Bump_FrontLeft\",\"enabled\":false}," +
-				"{\"sensorName\":\"Bump_RearRight\",\"enabled\":false}," +
-				"{\"sensorName\":\"Bump_RearLeft\",\"enabled\":false}]}";
-
-			WebMessenger wm = new WebMessenger();
-			var r = await wm.PostRequest(endpoint, data, "application/json");
-			LogMessage($"Post {endpoint}. Result is {r.HttpCode} - {r.Response}.");
-		}
-
-		public async Task EnableHazardSystemAsync()
-		{
-			string endpoint = "http://10.10.10.10/api/hazard/updatebasesettings";
-
-			string data = "{\"timeOfFlightThresholds\":[" +
-				"{\"sensorName\":\"TOF_DownFrontRight\",\"threshold\":0.06}," +
-				"{\"sensorName\":\"TOF_DownFrontLeft\",\"threshold\":0.06}," +
-				"{\"sensorName\":\"TOF_DownBackRight\",\"threshold\":0.06}," +
-				"{\"sensorName\":\"TOF_DownBackLeft\",\"threshold\":0.06}," +
-				"{\"sensorName\":\"TOF_Right\",\"threshold\":0.215}," +
-				"{\"sensorName\":\"TOF_Left\",\"threshold\":0.215}," +
-				"{\"sensorName\":\"TOF_Center\",\"threshold\":0.215}," +
-				"{\"sensorName\":\"TOF_Back\",\"threshold\":0.215}]," +
-				"\"bumpSensorsEnabled\":[" +
-				"{\"sensorName\":\"Bump_FrontRight\",\"enabled\":true}," +
-				"{\"sensorName\":\"Bump_FrontLeft\",\"enabled\":true}," +
-				"{\"sensorName\":\"Bump_RearRight\",\"enabled\":true}," +
-				"{\"sensorName\":\"Bump_RearLeft\",\"enabled\":true}]}";
-
-			WebMessenger wm = new WebMessenger();
-			var r = await wm.PostRequest(endpoint, data, "application/json");
-			LogMessage($"Post {endpoint}. Result is {r.HttpCode} - {r.Response}.");
-		}
-
-		#endregion
-
-		#region Private Methods
-
-		private void TofEventCallback(ITimeOfFlightEvent eventResponse)
-		{
-			switch (eventResponse.SensorPosition)
-			{
-				case MistyRobotics.Common.Types.TimeOfFlightPosition.FrontLeft:
-					if (eventResponse.Status == 0)
-						_tofValues.FrontLeft = eventResponse.DistanceInMeters;
-					else
-						_tofValues.FrontLeft = 5;
-					break;
-				case MistyRobotics.Common.Types.TimeOfFlightPosition.FrontCenter:
-					if (eventResponse.Status == 0)
-						_tofValues.FrontCenter = eventResponse.DistanceInMeters;
-					else
-						_tofValues.FrontCenter = 5;
-					break;
-				case MistyRobotics.Common.Types.TimeOfFlightPosition.FrontRight:
-					if (eventResponse.Status == 0)
-						_tofValues.FrontRight = eventResponse.DistanceInMeters;
-					else
-						_tofValues.FrontRight = 5;
-					break;
-				case MistyRobotics.Common.Types.TimeOfFlightPosition.Back:
-					if (eventResponse.Status == 0)
-						_tofValues.Back = eventResponse.DistanceInMeters;
-					else
-						_tofValues.Back = 5;
-					break;
-			}
+			return diff;
 		}
 
 		private void HazardEventCallback(IHazardNotificationEvent eventResponse)
@@ -478,16 +495,20 @@ namespace MistySkillTypes
 					_headPosition.Roll = eventResponse.ActuatorValue;
 					break;
 			}
-
-			if (_headPosition.Pitch.HasValue && _headPosition.Yaw.HasValue && _headPosition.Roll.HasValue)
-			{
-				_headPositionSemaphore?.Release();
-			}
 		}
 
 		private void EncoderEventCallback(IDriveEncoderEvent eventResponse)
 		{
+			if (LastEncoderMessageReceived == DateTime.MinValue)
+			{
+				LastEncoderMessageReceived = DateTime.Now;
+				LogMessage("First encoder event message received.");
+			}
+
+			LastEncoderMessageReceived = DateTime.Now;
+
 			_leftEncoderValue = eventResponse.LeftDistance;
+			_lastEncoderValue = DateTime.Now;
 
 			if (_leftEncoderValues != null)
 			{
@@ -500,6 +521,14 @@ namespace MistySkillTypes
 			// Angles come between 0 and 360.
 			// Store angles between -180 and 180
 			// Also, we sometimes see large negative spikes of noise. Ignore these. I believe that this is a robot specific problem.
+
+			if (LastImuMessageReceived == DateTime.MinValue)
+			{
+				LastImuMessageReceived = DateTime.Now;
+				LogMessage("First IMU event message received.");
+			}
+
+			LastImuMessageReceived = DateTime.Now;
 
 			if (eventResponse.Yaw >= 0)
 			{
@@ -528,12 +557,12 @@ namespace MistySkillTypes
 
 		private void OnResponse(IRobotCommandResponse commandResponse)
 		{
-
+			//Debug.WriteLine(commandResponse.Status);
 		}
 
-		#endregion
+#endregion
 
-		#region IDisposable Support
+#region IDisposable Support
 		private bool disposedValue = false; // To detect redundant calls
 
 		protected virtual void Dispose(bool disposing)
@@ -547,11 +576,6 @@ namespace MistySkillTypes
 
 				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
 				// TODO: set large fields to null.
-				LogMessage("SkillHelper.Dispose");
-				_misty?.UnregisterEvent("SkillHelperIMUEvent", OnResponse);
-				_misty?.UnregisterEvent("SkillHelperEncoderEvent", OnResponse);
-				_misty.UnregisterEvent("SkillHelperHazardEvent", OnResponse);
-
 				disposedValue = true;
 			}
 		}
@@ -570,7 +594,7 @@ namespace MistySkillTypes
 			// TODO: uncomment the following line if the finalizer is overridden above.
 			// GC.SuppressFinalize(this);
 		}
-		#endregion
+#endregion
 	}
 
 	public class TofValues

@@ -1,79 +1,54 @@
-/******************************************************************************
-*    Copyright 2020 Misty Robotics, Inc.
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-* 
-* 	 **WARRANTY DISCLAIMER.**
-* 
-* 	 * General. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, MISTY
-* 	 ROBOTICS PROVIDES THIS SAMPLE SOFTWARE "AS-IS" AND DISCLAIMS ALL
-* 	 WARRANTIES AND CONDITIONS, WHETHER EXPRESS, IMPLIED, OR STATUTORY,
-* 	 INCLUDING THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-* 	 PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY, AND NON-INFRINGEMENT OF
-* 	 THIRD-PARTY RIGHTS. MISTY ROBOTICS DOES NOT GUARANTEE ANY SPECIFIC
-* 	 RESULTS FROM THE USE OF THIS SAMPLE SOFTWARE. MISTY ROBOTICS MAKES NO
-* 	 WARRANTY THAT THIS SAMPLE SOFTWARE WILL BE UNINTERRUPTED, FREE OF VIRUSES
-* 	 OR OTHER HARMFUL CODE, TIMELY, SECURE, OR ERROR-FREE.
-* 	 * Use at Your Own Risk. YOU USE THIS SAMPLE SOFTWARE AND THE PRODUCT AT
-* 	 YOUR OWN DISCRETION AND RISK. YOU WILL BE SOLELY RESPONSIBLE FOR (AND MISTY
-* 	 ROBOTICS DISCLAIMS) ANY AND ALL LOSS, LIABILITY, OR DAMAGES, INCLUDING TO
-* 	 ANY HOME, PERSONAL ITEMS, PRODUCT, OTHER PERIPHERALS CONNECTED TO THE PRODUCT,
-* 	 COMPUTER, AND MOBILE DEVICE, RESULTING FROM YOUR USE OF THIS SAMPLE SOFTWARE
-* 	 OR PRODUCT.
-* 
-* 	 Please refer to the Misty Robotics End User License Agreement for further
-* 	 information and full details:
-* 	 	https://www.mistyrobotics.com/legal/end-user-license-agreement/
-******************************************************************************/
+/**********************************************************************
+	Copyright 2021 Misty Robotics
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+		http://www.apache.org/licenses/LICENSE-2.0
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+	**WARRANTY DISCLAIMER.**
+	* General. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, MISTY
+	ROBOTICS PROVIDES THIS SAMPLE SOFTWARE "AS-IS" AND DISCLAIMS ALL
+	WARRANTIES AND CONDITIONS, WHETHER EXPRESS, IMPLIED, OR STATUTORY,
+	INCLUDING THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+	PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY, AND NON-INFRINGEMENT OF
+	THIRD-PARTY RIGHTS. MISTY ROBOTICS DOES NOT GUARANTEE ANY SPECIFIC
+	RESULTS FROM THE USE OF THIS SAMPLE SOFTWARE. MISTY ROBOTICS MAKES NO
+	WARRANTY THAT THIS SAMPLE SOFTWARE WILL BE UNINTERRUPTED, FREE OF VIRUSES
+	OR OTHER HARMFUL CODE, TIMELY, SECURE, OR ERROR-FREE.
+	* Use at Your Own Risk. YOU USE THIS SAMPLE SOFTWARE AND THE PRODUCT AT
+	YOUR OWN DISCRETION AND RISK. YOU WILL BE SOLELY RESPONSIBLE FOR (AND MISTY
+	ROBOTICS DISCLAIMS) ANY AND ALL LOSS, LIABILITY, OR DAMAGES, INCLUDING TO
+	ANY HOME, PERSONAL ITEMS, PRODUCT, OTHER PERIPHERALS CONNECTED TO THE PRODUCT,
+	COMPUTER, AND MOBILE DEVICE, RESULTING FROM YOUR USE OF THIS SAMPLE SOFTWARE
+	OR PRODUCT.
+	Please refer to the Misty Robotics End User License Agreement for further
+	information and full details:
+		https://www.mistyrobotics.com/legal/end-user-license-agreement/
+**********************************************************************/
 
-//#define MAP_DOCK
-
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MistyRobotics.Common.Data;
 using MistyRobotics.SDK.Responses;
 using MistyRobotics.SDK;
 using MistyRobotics.SDK.Messengers;
-using MistySkillTypes;
+using MistyNavigation;
 
 namespace DriveAndDock
 {
-	/// <summary>
-	/// 1. Reads a file defining a path and delegate actions.
-	/// 2. Misty follows the path and invokes the delegate accordingly.
-	/// 3. Attempts to dock on the charger at the end of the path.
-	/// See README.txt for more details.
-	/// </summary>
 	internal class MistySkill : IMistySkill
 	{
-		private const string PATH_FILE_NAME = "path1.txt";
-
-		// Adjustments for this particular robot to achieve a level head position.
-		private const double HEAD_PITCH_OFFSET = -3;
-		private const double HEAD_ROLL_OFFSET = 4;
-		private const double HEAD_YAW_OFFSET = 0;
-
-		// Name of the map around the charger and the map cell values that put Misty
-		// about 0.25 meters in front of the charger facing the charger.
-		private const string MAP_NAME = "Map_20200128_17.46.35.UTC";
-		private const int MAP_DOCK_X = 168;
-		private const int MAP_DOCK_Y = 121;
-		private const int MAP_DOCK_YAW = 0;
+		private const string DefaultRecipe = "path1.txt";
 
 		private IRobotMessenger _misty;
 		private SkillHelper _skillHelper;
 		private FollowPath _followPath;
-		private ChargerDock _docker;
-		private MapNav _mapNav;
 
 		public INativeRobotSkill Skill { get; private set; } = new NativeRobotSkill("DriveAndDock", "b4075ac6-a9a5-4519-a7c5-4ae6cceb8f79");
 
@@ -87,80 +62,71 @@ namespace DriveAndDock
 		{
 			Task.Run(async () =>
 			{
+				// Just in case things weren't cleaned up last time.
+				_misty.UnregisterAllEvents(OnResponse);
+				await Task.Delay(2000); // Let unregister complete before starting to register for events
+
 				_skillHelper = new SkillHelper(_misty);
-				await Task.Delay(3000);
+				_skillHelper.MistySpeak("Initiating prototype path following skill.");
+				_skillHelper.LogMessage("Initiating prototype path following skill v0.0.10.");
 
-				// Load the path to follow.
-				_followPath = new FollowPath(_misty, _skillHelper);
-				List<IFollowPathCommand> commands = await _followPath.LoadCommandsAsync(PATH_FILE_NAME, MyDelegateAsync);
+				// So she doesn't look dead
+				await _skillHelper.MoveHeadAsync(0, 0, 0);
 
-				// Follow the path
-				await _followPath.DriveAsync(commands);
-
-				// Dock
-				await _skillHelper.DisableHazardSystemAsync();
-
-				// Dock
-#if MAP_DOCK
-				bool started = await DockAlignAsync();
-				if (started)
+				// Sometimes event messages don't start flowing. So wait and check for that before starting to run.
+				// Hopefully this logic is temporary.
+				DateTime start = DateTime.Now;
+				while((_skillHelper.LastEncoderMessageReceived < start || _skillHelper.LastImuMessageReceived < start) && 
+					DateTime.Now.Subtract(start).TotalSeconds < 15)
 				{
-					await _skillHelper.TurnAsync(180);
-					_misty.DriveHeading(0, .6, 3000, true, OnResponse);
-					await Task.Delay(4000);
-					_misty.DriveHeading(0, .2, 1000, true, OnResponse);
-					await Task.Delay(2000);
-					_misty.PlayAudio("s_Awe.wav", 100, OnResponse);
+					await Task.Delay(500);
 				}
-#else
-				_docker = new ChargerDock(_misty, _skillHelper, HEAD_PITCH_OFFSET, HEAD_ROLL_OFFSET, HEAD_YAW_OFFSET);
-				await _docker.DockAsync();
-#endif
-				await _skillHelper.EnableHazardSystemAsync();
+				if(_skillHelper.LastEncoderMessageReceived > start && _skillHelper.LastImuMessageReceived > start)
+				{
+					// Load the path to follow.
+					string recipeName = DefaultRecipe;
+					string key = parameters.Keys.FirstOrDefault(k => k.ToUpper() == "RECIPE");
+					if (!string.IsNullOrWhiteSpace(key))
+					{
+						recipeName = parameters[key].ToString();
+					}
 
-				await Task.Delay(30000);
+					_followPath = new FollowPath(_misty, _skillHelper);
+					await Task.Delay(2000); // Let any internal cleanup complete before running.
+
+					List<IFollowPathCommand> commands = await _followPath.LoadCommandsAsync(recipeName, MyDelegateAsync);
+
+					// Follow the path
+					await _followPath.Execute(commands);
+				}
+				else
+				{
+					_skillHelper.LogMessage($"IMU and/or encoder messages never started flowing. Last encoder message: {_skillHelper.LastEncoderMessageReceived}. " +
+						$"Last IMU message: {_skillHelper.LastImuMessageReceived}.");
+					_skillHelper.MistySpeak("I am not receiving IMU and encoder messages as expected. Unable to execute the recipe.");
+				}
 
 				Cleanup();
 			});
 		}
 
-		private async Task<bool> MyDelegateAsync()
+		// Delegate:x in the recipe file will result in this method being called with argument = x
+		private async Task<bool> MyDelegateAsync(string argument)
 		{
 			_skillHelper.LogMessage("Executing delegate.");
 
-			_misty.PlayAudio("s_SystemSuccess.wav", 5, OnResponse);
-			await Task.Delay(1000);
-
-			return true;
-		}
-
-		private async Task<bool> DockAlignAsync()
-		{
-			_mapNav = new MapNav(_misty, _skillHelper, HEAD_PITCH_OFFSET, HEAD_ROLL_OFFSET, HEAD_YAW_OFFSET);
-
-			bool gotPose = await _mapNav.StartTrackingAsync(MAP_NAME);
-			if (!gotPose)
-			{
-				_misty.PlayAudio("s_Annoyance.wav", 100, OnResponse);
-				await Task.Delay(2000);
-				_mapNav.Cleanup();
-				return false;
-			}
-
-			await _mapNav.MoveToAsync(MAP_DOCK_X, MAP_DOCK_Y, MAP_DOCK_YAW, 0);
-
-			_mapNav.Cleanup();
-
+			// Your code here. Whatever you want.
+			await _misty.ChangeLEDAsync(50, 100, 100);
+			
 			return true;
 		}
 
 		private void Cleanup()
 		{
 			_followPath?.Abort();
-			_docker?.Abort();
-			_mapNav?.Abort();
 			_skillHelper?.Abort();
 
+			_misty.UnregisterAllEvents(OnResponse);
 			_misty.SkillCompleted();
 		}
 
@@ -171,7 +137,7 @@ namespace DriveAndDock
 
 		public void OnResume(object sender, IDictionary<string, object> parameters)
 		{
-
+			
 		}
 		
 		public void OnCancel(object sender, IDictionary<string, object> parameters)
